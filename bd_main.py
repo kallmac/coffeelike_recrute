@@ -15,3 +15,11 @@ cur.execute('CREATE TABLE IF NOT EXISTS devs (id int auto_increment primary key,
 conn.commit()
 cur.close()
 conn.close()
+
+conn = sqlite3.connect('bans.sql')
+cur = conn.cursor()
+cur.execute('CREATE TABLE IF NOT EXISTS devs (id int auto_increment primary key, tg_id varchar(255))')
+conn.commit()
+cur.close()
+conn.close()
+
