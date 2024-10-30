@@ -1,11 +1,22 @@
-import telebot
-from telebot import types
 import sqlite3
 
+# Подключаемся к базе данных
 conn = sqlite3.connect('everyone.sql')
 cur = conn.cursor()
-cur.execute('CREATE TABLE IF NOT EXISTS users (id int auto_increment primary key, tg_id varchar(255), tg_username varchar(255), status varchar(255), notif int)')
+
+# Создаем таблицу users
+cur.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tg_id TEXT,
+        tg_username TEXT,
+        status TEXT,
+        notif INTEGER
+    )
+''')
+# Сохраняем изменения и закрываем соединение
 conn.commit()
 cur.close()
 conn.close()
+
 

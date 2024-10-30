@@ -6,7 +6,7 @@ import sqlite3
 API_TOKEN = '7712920785:AAGLtViAA6H34GcDBBy896TCZX_mwwjM80M' # ЗАМЕНИТЕ НА СВОЙ
 bot = telebot.TeleBot(API_TOKEN)
 
-db = sqlite3.connect('everyone.sql', check_same_thread=False)#подключаем бд
+db = sqlite3.connect('everyone.sql')#подключаем бд
 c = db.cursor()
 #c.execute("CREATE TABLE devs(id int, username text)")
 #c.execute("CREATE TABLE admins(id int, username text)")
@@ -15,10 +15,12 @@ c = db.cursor()
 #в db уже созданы таблицы devs, admins, users, bans с колонками id и username
 #c.execute("INSERT INTO devs VALUES(228432526, 'slilturforever')")
 def role(user):
-    c.execute('SELECT EXISTS(SELECT id FROM users WHERE username = ?)', (user,))
+
+    c.execute('SELECT EXISTS(SELECT status FROM users WHERE tg_username = ?)', (user,))
     if(c.fetchone()[0]):
-        return 'ban'
-    c.execute('SELECT EXISTS(SELECT id FROM users WHERE username = ?)', (user,))
+        return c.fetchone()[0]
+    return 'none'
+    '''c.execute('SELECT EXISTS(SELECT id FROM users WHERE username = ?)', (user,))
     if(c.fetchone()[0]):
         return 'user'
     c.execute('SELECT EXISTS(SELECT id FROM admins WHERE username = ?)', (user,))
@@ -27,7 +29,7 @@ def role(user):
     c.execute('SELECT EXISTS(SELECT id FROM devs WHERE username = ?)', (user,))
     if(c.fetchone()[0]):
         return 'dev'
-    return 'none'
+    return 'none'  '''
 def adm(message):
     rol = role(message.from_user.username)
     if(rol=='admin' or rol=='dev'):
@@ -116,18 +118,18 @@ def baned(message):
 @bot.callback_query_handler(func = lambda callback : callback.data[0:4] == 'ban_')
 def ban(callback):
     user = callback.data.split("_")[1]
-    c.execute("SELECT * from users WHERE username = ?", (user,))
-    tup = c.fetchone()
-    c.execute(f"INSERT INTO bans (id, username) VALUES (?, ?)", tup)
-    c.execute("DELETE FROM users WHERE username = ?", (user,))
+    c.execute("UPDATE users SET status = 'ban' WHERE tg_username = ?", (user,))
     bot.send_message(callback.message.chat.id, "Пользователь заблокирован!")
+    '''c.execute("SELECT * from users WHERE tg_username = ?", (user,))
+        tup = c.fetchone()
+        tup[3] = 'ban'
+        tup[4] = 0
+        c.execute(f"INSERT INTO users (id, tg_id, tg_username, status, notif) VALUES (?, ?, ?, ?, ?)", tup)
+        c.execute("DELETE FROM users WHERE tg_username = ?", (user,))'''
 @bot.callback_query_handler(func = lambda callback : callback.data[0:6] == 'unban_')
 def unban(callback):
     user = callback.data.split("_")[1]
-    c.execute("SELECT * from bans WHERE username = ?", (user,))
-    tup = c.fetchone()
-    c.execute("INSERT INTO users (id, username) VALUES(?, ?)", tup)
-    c.execute("DELETE FROM bans WHERE username = ?", (user,))
+    c.execute("UPDATE users SET status = 'user' WHERE tg_username = ?", (user,))
     bot.send_message(callback.message.chat.id, "Пользователь разблокирован!")
 #def add_admin(message):
 bot.polling()
