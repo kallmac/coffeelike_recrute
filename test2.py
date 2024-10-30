@@ -1,6 +1,8 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, \
     ReplyKeyboardRemove
+import pandas as pd
+import openpyxl
 
 # dev
 from icecream import ic
@@ -78,6 +80,10 @@ def ask_question(user_id):
         bot.send_message(user_id, "Навигация:", reply_markup=inline_keyboard)
     else:
         bot.send_message(user_id, "Спасибо за участие! Ваши ответы: " + str(user_answers[user_id]))
+        user_answ = list(user_answers[user_id].values())
+        df = pd.DataFrame(user_answ)
+        # Сохранение в Excel файл
+        df.to_excel('D:/Project/pyCharm/coffeelike_recrute/bot/db/applicants.xlsx', index=False)
         del user_answers[user_id]
         del user_question_index[user_id]
 

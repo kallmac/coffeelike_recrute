@@ -109,7 +109,7 @@ class UsersTable:
         cur.close()
         conn.close()
 
-    def edit_rol(usr_id, role: str,  self):
+    def edit_rol(usr_id, role: str, self: object) -> object:
         conn = sqlite3.connect('everyone.sql')
         cur = conn.cursor()
         cur.execute('UPDATE users SET status = ? WHERE tg_id == ?', (role, usr_id))
