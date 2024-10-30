@@ -39,7 +39,7 @@ class UsersTable:
              'username': user_info[2],
              'status': user_info[3],
              'notif': user_info[4]}
-        return user_dict # возвращает словарь с инфой о пользователе
+        return user_dict # возвращает словарь с инф ой о пользователе
 
     def is_dev(self, usr_id) -> bool:
         conn = sqlite3.connect('C:/Users/Andrey/PycharmProjects/coffeelike_recrute/bot/db/everyone.sql')
