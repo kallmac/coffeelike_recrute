@@ -124,6 +124,16 @@ class UsersTable:
         conn.commit()
         cur.close()
         conn.close()
-
+    def get_id(username, self):
+        conn = sqlite3.connect('everyone.sql')
+        cur = conn.cursor()
+        cur.execute(f'SELECT tg_id FROM everyone WHERE tg_username = {username}')
+        usr_id = cur.fetchone()[0]
+        conn.commit()
+        cur.close()
+        conn.close()
+        if(usr_id):
+            return usr_id
+        return None
 a = UsersTable()
 a.add_user({"id":"228", "username":"goida", "status":"user", "notif" : 0})
