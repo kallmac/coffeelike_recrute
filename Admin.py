@@ -1,3 +1,4 @@
+#пока это не правильный админ
 import telebot
 from telebot import types
 import sqlite3
@@ -5,26 +6,33 @@ import sqlite3
 API_TOKEN = '7712920785:AAGLtViAA6H34GcDBBy896TCZX_mwwjM80M' # ЗАМЕНИТЕ НА СВОЙ
 bot = telebot.TeleBot(API_TOKEN)
 
-db = sqlite3.connect('users.db')#подключаем бд
+db = sqlite3.connect('user.db', check_same_thread=False)#подключаем бд
 c = db.cursor()
-#c.execute("CREATE TABLE devs(id text, username text)")
-#c.execute("CREATE TABLE admins(id text, username text)")
-#c.execute("CREATE TABLE users(id text, username text)")
-#c.execute("CREATE TABLE bans(id text, username text)")
-# в db уже созданы таблицы devs, admins, users, bans с колонками id и username
+#c.execute("CREATE TABLE devs(id int, username text)")
+#c.execute("CREATE TABLE admins(id int, username text)")
+#c.execute("CREATE TABLE users(id int, username text)")
+#c.execute("CREATE TABLE bans(id int, username text)")
+#в db уже созданы таблицы devs, admins, users, bans с колонками id и username
+#c.execute("INSERT INTO admins VALUES(52, 'goida')")
+def role(user_id):
+    c.execute('SELECT EXISTS(SELECT id FROM bans WHERE id = ?)', (user_id,))
+    if(c.fetchone()[0]):
+        return 'ban'
+    c.execute('SELECT EXISTS(SELECT id FROM users WHERE id = ?)', (user_id,))
+    if(c.fetchone()[0]):
+        return 'user'
+    c.execute('SELECT EXISTS(SELECT id FROM admins WHERE id = ?)', (user_id,))
+    if(c.fetchone()[0]):
+        return 'admin'
+    c.execute('SELECT EXISTS(SELECT id FROM devs WHERE id = ?)', (user_id,))
+    if(c.fetchone()[0]):
+        return 'dev'
+    return 'none'
 def adm(message):
-    # проверка на admin или dev
-    isadm = False
-    if(message.from_user.username == 'drus1k0'):
-        isadm = True
-    user_id = str(message.from_user.id)
-    c.execute("SELECT id FROM admins WHERE id = user_id")
-    if(len(c.fetchall())):
-        isadm = True #admin
-    c.execute("SELECT id FROM devs WHERE id = user_id")
-    if (len(c.fetchall())):
-        isadm = True #dev
-    return isadm
+    rol = role(message.from_user.id)
+    if(rol=='admin' or rol=='dev'):
+        return True
+    return False
 #уведомления
 global is_push
 is_push = True
@@ -51,6 +59,7 @@ def table(callback):
         bot.send_document(callback.message.chat.id, year_table)
 @bot.message_handler(commands=['notification'],  func = adm) #уведомления
 def pushes(message):
+
     kb = types.InlineKeyboardMarkup(row_width=2)
     on = types.InlineKeyboardButton(text='Вкл', callback_data='on')
     off = types.InlineKeyboardButton(text='Выкл', callback_data='off')
@@ -69,11 +78,11 @@ def ban(message):
     sent = bot.send_message(message.chat.id, "Кого банить?")
     bot.register_next_step_handler(sent, baned) #ждём ответа
 def baned(message):
-    c.execute("SELECT username FROM users WHERE username = message.text")
-    if(c.fetchall().size()):
-        c.execute("SELECT id FROM users WHERE username = message.text")
+    c.execute("SELECT username FROM users WHERE username = ?", (message.text,))
+    if(c.fetchone()[0]):
+        c.execute("SELECT id FROM users WHERE username = ?", (message.text,))
         user_id = c.fetchone()[0]
-        c.execute("DELETE FROM users WHERE username = message.textt")
+        c.execute("DELETE FROM users WHERE username = message.text")
         c.execute("INSERT INTO bans VALUES(user_id, message.text)")
         bot.send_message(message.chat.id, "Негодяй забанен")
     else:
