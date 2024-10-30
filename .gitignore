@@ -1,5 +1,5 @@
 .idea
 .gitignore
 .venv
-everyone.sql
-everyone.sql
+bot/db/everyone.sql
+bot/db/everyone.sql

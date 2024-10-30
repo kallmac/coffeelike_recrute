@@ -1,14 +1,20 @@
 #пока это не правильный админ
 import telebot
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, \
+    ReplyKeyboardRemove
 from telebot import types
 import sqlite3
 
+from config import UsersTable
+
+
 # dev
+from icecream import ic
 # dev
 API_TOKEN = '7712920785:AAGLtViAA6H34GcDBBy896TCZX_mwwjM80M' # ЗАМЕНИТЕ НА СВОЙ
 bot = telebot.TeleBot(API_TOKEN)
 
-db = sqlite3.connect('everyone.sql')#подключаем бд
+db = sqlite3.connect('everyone.sql', check_same_thread=False)#подключаем бд
 c = db.cursor()
 
 questions = [
