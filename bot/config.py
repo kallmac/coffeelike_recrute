@@ -42,56 +42,28 @@ class UsersTable:
         return user_dict # возвращает словарь с инф ой о пользователе
 
     def is_dev(self, usr_id) -> bool:
-        conn = sqlite3.connect('C:/Users/Andrey/PycharmProjects/coffeelike_recrute/bot/db/everyone.sql')
-        cur = conn.cursor()
-        cur.execute('SELECT status FROM everyone WHERE tg_id = ?', (usr_id,))
-        rol = cur.fetchone()[0]
-        conn.commit()
-        cur.close()
-        conn.close()
-        if (rol == 'dev'):
+        role = self.get_role(usr_id)
+        if(role=='dev'):
             return True
-        else:
-            return False
+        return False
 
     def is_admin(self, usr_id) -> bool:
-        conn = sqlite3.connect('C:/Users/Andrey/PycharmProjects/coffeelike_recrute/bot/db/everyone.sql')
-        cur = conn.cursor()
-        cur.execute('SELECT status FROM everyone WHERE tg_id = ?', (usr_id,))
-        rol = cur.fetchone()[0]
-        conn.commit()
-        cur.close()
-        conn.close()
-        if(rol=='admin' or rol=='dev'):
+        role = self.get_role(usr_id)
+        if (role == 'admin' or role == 'dev'):
             return True
-        else:
-            return False
+        return False
 
     def is_user(self, usr_id) -> bool:
-        conn = sqlite3.connect('C:/Users/Andrey/PycharmProjects/coffeelike_recrute/bot/db/everyone.sql')
-        cur = conn.cursor()
-        cur.execute('SELECT status FROM everyone WHERE tg_id = ?', (usr_id,))
-        rol = cur.fetchone()[0]
-        conn.commit()
-        cur.close()
-        conn.close()
-        if (rol == 'user' or rol == 'dev'):
+        role = self.get_role(usr_id)
+        if (role == 'user' or role == 'dev'):
             return True
-        else:
-            return False
+        return False
 
     def is_ban(self, usr_id) -> bool:
-        conn = sqlite3.connect('C:/Users/Andrey/PycharmProjects/coffeelike_recrute/bot/db/everyone.sql')
-        cur = conn.cursor()
-        cur.execute('SELECT status FROM everyone WHERE tg_id = ?', (usr_id,))
-        rol = cur.fetchone()[0]
-        conn.commit()
-        cur.close()
-        conn.close()
-        if (rol == 'ban'):
+        role = self.get_role(usr_id)
+        if(role=='ban'):
             return True
-        else:
-            return False
+        return False
 
     def is_notif(self, usr_id):
         conn = sqlite3.connect('C:/Users/Andrey/PycharmProjects/coffeelike_recrute/bot/db/everyone.sql')
