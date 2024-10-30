@@ -38,6 +38,21 @@ class UsersTable:
         else:
             return False
 
+    def get_role(usr_id, self):
+        cur.execute('SELECT EXISTS(SELECT status FROM users WHERE tg_username = ?)', (user,))
+        if (cur.fetchone()[0]):
+            return cur.fetchone()[0]
+        return None
+    def is_notif(usr_id, self):
+        conn = sqlite3.connect('everyone.sql')
+        cur = conn.cursor()
+        cur.execute(f'SELECT notif FROM everyone WHERE tg_id = {usr_id}')
+        ans = cur.fetchone()[0]
+        conn.commit()
+        cur.close()
+        conn.close()
+        return ans
+
     def is_ban(usr_id, self) -> bool:
         conn = sqlite3.connect('everyone.sql')
         cur = conn.cursor()
@@ -80,7 +95,7 @@ class UsersTable:
     def add_user(usr_data: dict, self):
         conn = sqlite3.connect('everyone.sql')
         cur = conn.cursor()
-        cur.execute('INSERT INTO everyone (tg_id, tg_username, status, notif)VALUES(%s, %s, %s, %s)' % (dict['id'], dict['username'], dict['status'], dict['notif']))
+        cur.execute(f'INSERT INTO everyone (tg_id, tg_username, status, notif) VALUES({usr_data["id"]}, {usr_data["username"]}, {usr_data["status"]}, {usr_data["notif"]})')
         conn.commit()
         cur.close()
         conn.close()
@@ -110,3 +125,5 @@ class UsersTable:
         cur.close()
         conn.close()
 
+a = UsersTable()
+a.add_user({"id":"228", "username":"goida", "status":"user", "notif" : 0})
