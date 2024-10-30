@@ -6,16 +6,16 @@ import sqlite3
 API_TOKEN = '7712920785:AAGLtViAA6H34GcDBBy896TCZX_mwwjM80M' # ЗАМЕНИТЕ НА СВОЙ
 bot = telebot.TeleBot(API_TOKEN)
 
-db = sqlite3.connect('user.db', check_same_thread=False)#подключаем бд
+db = sqlite3.connect('everyone.sql', check_same_thread=False)#подключаем бд
 c = db.cursor()
 #c.execute("CREATE TABLE devs(id int, username text)")
 #c.execute("CREATE TABLE admins(id int, username text)")
 #c.execute("CREATE TABLE users(id int, username text)")
 #c.execute("CREATE TABLE bans(id int, username text)")
 #в db уже созданы таблицы devs, admins, users, bans с колонками id и username
-#c.execute("INSERT INTO users VALUES(228, 'eshkere')")
+#c.execute("INSERT INTO devs VALUES(228432526, 'slilturforever')")
 def role(user):
-    c.execute('SELECT EXISTS(SELECT id FROM bans WHERE username = ?)', (user,))
+    c.execute('SELECT EXISTS(SELECT id FROM users WHERE username = ?)', (user,))
     if(c.fetchone()[0]):
         return 'ban'
     c.execute('SELECT EXISTS(SELECT id FROM users WHERE username = ?)', (user,))
@@ -57,7 +57,7 @@ def table(callback):
     else:
         year_table = read('year_table.xslx', 'rb') #хз чё писать
         bot.send_document(callback.message.chat.id, year_table)
-@bot.message_handler(commands=['notification'])#,  func = adm) #уведомления
+@bot.message_handler(commands=['notification'],  func = adm) #уведомления
 def pushes(message):
     kb = types.InlineKeyboardMarkup(row_width=1)
     esc = types.InlineKeyboardButton(text='Отмена', callback_data='esc')
@@ -82,7 +82,7 @@ def change_push(callback):
         is_push = False
         bot.send_message(callback.message.chat.id, 'Уведомления выключены!')
 
-@bot.message_handler(commands = ['ban'])#, func = adm) #ну бан
+@bot.message_handler(commands = ['ban'], func = adm) #ну бан
 def ban(message):
     sent = bot.send_message(message.chat.id, "Кого банить?")
     bot.register_next_step_handler(sent, baned) #ждём ответа
