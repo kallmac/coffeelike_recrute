@@ -5,10 +5,12 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeybo
 from config import UsersTable
 import os
 
+from icecream import ic
+
 # dev
 # dev
 
-API_TOKEN = '7712920785:AAGLtViAA6H34GcDBBy896TCZX_mwwjM80M' # ЗАМЕНИТЕ НА СВОЙ
+API_TOKEN = '7945741419:AAH1F1zVR4xlLfX6_HHt2V_HoWQO-qVv_zc' # ЗАМЕНИТЕ НА СВОЙ
 bot = telebot.TeleBot(API_TOKEN)
 
 questions = [
@@ -23,8 +25,15 @@ user_question_index = {}
 
 db = UsersTable()
 
-@bot.message_handler(commands = ['get_table'], func= lambda message: db.is_admin(message.from_user.id) or db.is_dev(message.from_user.id))
+
+
+@bot.message_handler(commands= ['start'])
+def start(message):
+    print(message.from_user.id, message.from_user.username)
+    db.add_user({"id": str(message.from_user.id), "username": message.from_user.username, "status": "user", "notif": 1})
+@bot.message_handler(commands = ['get_table'], func= lambda message: db.is_admin(message.from_user.id))
 def get_table(message):
+    ic(message.from_user.id)
     kb = InlineKeyboardMarkup(row_width=3)
     week = InlineKeyboardButton(text='Месяц', callback_data='week')
     mounth = InlineKeyboardButton(text='Неделя', callback_data='mounth')
@@ -37,7 +46,7 @@ def table(callback):
     week_table = os.read('D:/Project/pyCharm/coffeelike_recrute/bot/db', 'rb')
     bot.send_document(callback.message.chat.id, week_table)
 
-@bot.message_handler(commands=['notification'], func= lambda message: db.is_admin(message.from_user.id) or db.is_dev(message.from_user.id)) #уведомления
+@bot.message_handler(commands=['notification'], func= lambda message: db.is_admin(message.from_user.id)) #уведомления
 def pushes(message):
     usr_id = message.from_user.id
     is_push = db.is_notif(usr_id)
@@ -73,10 +82,13 @@ def ban(message):
     sent = bot.send_message(message.chat.id, "Кого банить?")
     bot.register_next_step_handler(sent, baned) #ждём ответа
 def baned(message):
-    usr_id = message.from_user.id
+    usr_id = db.get_id(message.text)
     is_push = db.is_notif(usr_id)
 
     role = db.get_role(usr_id)
+    if role == None:
+        bot.send_message(message.chat.id, "Пользователь не найден в базе данных")
+        return
     if(role == 'user'):
         kb = InlineKeyboardMarkup(row_width=1)
         esc = InlineKeyboardButton(text='Отмена', callback_data='esc')
@@ -109,4 +121,6 @@ def unban(callback):
     is_push = db.is_notif(usr_id)
     db.edit_rol(usr_id=usr_id, role='user')
     bot.send_message(callback.message.chat.id, "Пользователь разблокирован!")
-#def add_admin(message):
+
+
+bot.polling(none_stop=True)
