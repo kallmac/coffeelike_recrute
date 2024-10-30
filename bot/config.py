@@ -13,8 +13,11 @@ class UsersTable:
     def add_user(self, usr_data: dict):
         conn = sqlite3.connect('db/everyone.sql')
         cur = conn.cursor()
-        cur.execute(f'INSERT INTO everyone (tg_id, tg_username, status, notif) VALUES(?, ?, ?, ?)',
-                    (usr_data["id"], usr_data["username"], usr_data["status"], usr_data["notif"]))
+        cur.execute('SELECT EXISTS(SELECT everyone WHERE tg_id = ?)', usr_data['id'])
+        existing = cur.fetchone()
+        if not existing:
+            cur.execute('INSERT INTO everyone (tg_id, tg_username, status, notif) VALUES(?, ?, ?, ?)',
+                        (usr_data["id"], usr_data["username"], usr_data["status"], usr_data["notif"]))
         conn.commit()
         cur.close()
         conn.close()
