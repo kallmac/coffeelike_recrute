@@ -60,7 +60,7 @@ def change_push(callback):
     is_push = db.is_notif(usr_id)
 
     bot.delete_message(callback.message.chat.id, callback.message.id)
-    if(is_push==False):
+    if is_push==False :
         is_push = True
         bot.send_message(callback.message.chat.id, 'Уведомления включены!')
     else:
@@ -95,7 +95,7 @@ def baned(message):
         bot.send_message(message.chat.id, "Пользователь не найден в базе данных")
 
 
-@bot.callback_query_handler(func = lambda callback : callback.data.split('_')[0] == 'ban_')
+@bot.callback_query_handler(func = lambda callback : callback.data.split('_')[0] == 'ban')
 def ban(callback):
     usr_id = callback.from_user.id
     is_push = db.is_notif(usr_id)
@@ -103,7 +103,7 @@ def ban(callback):
     bot.send_message(callback.message.chat.id, "Пользователь заблокирован!")
 
 
-@bot.callback_query_handler(func = lambda callback : callback.data.split('_')[0] == 'unban_')
+@bot.callback_query_handler(func = lambda callback : callback.data.split('_')[0] == 'unban')
 def unban(callback):
     usr_id = callback.from_user.id
     is_push = db.is_notif(usr_id)
