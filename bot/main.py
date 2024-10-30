@@ -121,6 +121,29 @@ def unban(callback):
     is_push = db.is_notif(usr_id)
     db.edit_rol(usr_id=usr_id, role='user')
     bot.send_message(callback.message.chat.id, "Пользователь разблокирован!")
+# о да сейчас я буду писать deva
 
+@bot.message_handler(commands = ['add_admin'], func = lambda message : db.is_dev(message.from_user.id))
+def add_admin(message):
+    sent = bot.send_message(message.chat.id, "Кого сделать админом?")
+    bot.register_next_step_handler(sent, baned)  # ждём ответа
 
+def get_admin(message):
+    username = message.text
+    usr_id = db.get_id(message.text)
+    db.add_user({"id":usr_id, "username":message.text, status:"admin", notif:1})
+    db.edit_rol(usr_id, "admin")
+    bot.send_message(message.chat.id, f"Пользователь {username} стал администратором")
+
+@bot.message_handler(commands = ['add_dev'], func = lambda message : db.is_dev(message.from_user.id))
+def add_dev(message):
+    sent = bot.send_message(message.chat.id, "Кого сделать супер-админом?")
+    bot.register_next_step_handler(sent, baned)  # ждём ответа
+
+def get_dev(message):
+    username = message.text
+    usr_id = db.get_id(message.text)
+    db.add_user({"id":usr_id, "username":message.text, status:"dev", notif:1})
+    db.edit_rol(usr_id, "dev")
+    bot.send_message(message.chat.id, f"Пользователь {username} стал супер-администратором")
 bot.polling(none_stop=True)
