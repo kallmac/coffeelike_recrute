@@ -1,7 +1,5 @@
-from gc import callbacks
-
 import telebot
-from pyexpat.errors import messages
+
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, \
     ReplyKeyboardRemove
 
@@ -15,7 +13,6 @@ from datetime import datetime, timedelta
 # dev
 from icecream import ic
 
-from gptgovno import user_message_ids
 
 # dev
 
@@ -41,7 +38,7 @@ user_answers = {}
 user_question_index = {}
 user_message_ids_to_del = {}
 user_ids = {}
-users_is_poll = {}
+users_is_poll = set()
 
 
 def notif_to_admin(user):
@@ -93,7 +90,7 @@ def filter_exel(date: datetime.date, input_file: str):
 
 # all users
 
-@bot.message_handler(commands= ['start'])
+@bot.message_handler(commands= ['start', 'info'], func = lambda message: not message.from_user.id in users_is_poll)
 def start(message):
     print(message.from_user.id, message.from_user.username)
     db.add_user({"id": str(message.from_user.id), "username": message.from_user.username, "status": "user", "notif": 1, "chat_id" : message.chat.id})
@@ -103,11 +100,32 @@ def start(message):
     if db.is_ban(usr_id):
         bot.reply_to(message=message, text="Администрация ограничила вам доступ к данному боту.")
     elif db.is_admin(usr_id):
-        ic(db.is_admin(usr_id))
-    else:
-        ic(usr_id)
         with open('img/startimg1.png', 'rb') as photo:
-            bot.send_photo(photo=photo ,chat_id=message.chat.id, caption=
+            bot.send_photo(photo=photo, chat_id=message.chat.id, parse_mode='Markdown', caption=
+"""
+Приветствую👋 
+Я бот компании Coffee Like! 
+Вы являетесь Админом, поэтому я проведу Вам небольшой экскурс по командам, которые Вам доступны!
+
+*__Команды:__*
+
+**Анализ:**
+/start — 😊Начало общения со мной
+/help — 📋Описание всех команд, доступных Вам
+/get_table — 📑Вам присылается файл xlsx (EXL-таблица), 
+                       собранная за определённый период времени: 
+                       неделю, месяц, год или за несколько лет.
+/notification — 👀Включение/отключение уведомлений 
+                              о новых отправленных анкетах
+/status — 📊Выводит ваш нынешний статус пользователя
+
+**Действия с пользователями:**
+/ban — Блокировка пользователя 
+          (блокировка администраторов Вам не доступна).
+/add_user — Добавления пользователя""")
+    else:
+        with open('img/startimg1.png', 'rb') as photo:
+            bot.send_photo(photo=photo, chat_id=message.chat.id, parse_mode='Markdown', caption=
 """
 Привет👋
 
@@ -142,7 +160,7 @@ def new_step(callback):
         current_date = datetime.now().date()
         user_answers[user_id]["date"] = current_date
         user_question_index[user_id] = 0  # Начинаем с первого вопроса
-        users_is_poll[user_id] = 1
+        users_is_poll.add(user_id)
         ask_question(user_id)
 
     elif callback.data == 'info_work':
@@ -229,14 +247,15 @@ def ban(message):
 
 
 def baned(message):
-    usr_id = db.get_id(message.text)
+    username = message.text[1:]
+    usr_id = db.get_id(username)
     is_push = db.is_notif(usr_id)
 
     role = db.get_role(usr_id)
-    if role == None:
+    if role is None:
         bot.send_message(message.chat.id, "Пользователь не найден в базе данных")
         return
-    if(role == 'user'):
+    if role == 'user':
         kb = InlineKeyboardMarkup(row_width=1)
         esc = InlineKeyboardButton(text='Отмена', callback_data='esc')
         ban = InlineKeyboardButton(text='Да', callback_data=f'ban_{message.text}')
@@ -290,11 +309,12 @@ def accepted(message):
 def add_admin(message):
     sent = bot.send_message(message.chat.id, "Кого?")
     bot.register_next_step_handler(sent, admin)
+
 def admin(message):
-    username = message.text
+    username = message.text[1:]
     id = db.get_id(username)
     role = db.get_role(id)
-    if(not role):
+    if not role:
         bot.send_message(message.chat.id, "Нет в бд")
         return
     db.edit_rol(id, 'admin')
@@ -305,15 +325,16 @@ def admin(message):
 def add_dev(message):
     sent = bot.send_message(message.chat.id, "Кого?")
     bot.register_next_step_handler(sent, dev)
+
 def dev(message):
-    username = message.from_user.username
+    username = message.from_user.username[1:]
     id = message.from_user.id
     role = db.get_role(id)
-    if(not role):
+    if not role:
         bot.send_message(message.chat.id, "Нет в бд")
         return
     db.edit_rol(id, 'dev')
-    db.edit_notif(id, 1)
+    db.edit_notif(id, True)
     bot.send_message(message.chat.id, "теперь супер-админ")
 
 
@@ -335,7 +356,7 @@ def create_reply_keyboard(options):
         keyboard.add(KeyboardButton(option))
     return keyboard
 
-@bot.message_handler(commands=['poll'], func = lambda message: not db.is_admin(message.from_user.id) and not users_is_poll[message.from_user.id])
+@bot.message_handler(commands=['poll'], func = lambda message: not db.is_admin(message.from_user.id) and message.from_user.id in users_is_poll)
 def start_quiz(message):
     ic(message.from_user.username)
     user_id = message.from_user.id
@@ -375,11 +396,12 @@ def ask_question(user_id):
     else:
         bot.send_message(user_id, "Спасибо за участие! Ваши ответы: " + str(user_answers[user_id]))
         add_row_to_excel(file_path=excel_file, new_row=user_answers[user_id])
+        users_is_poll.remove(user_id)
         del user_answers[user_id]
         del user_question_index[user_id]
         del user_message_ids_to_del[user_id]
 
-@bot.callback_query_handler(func=lambda call: call.data)
+@bot.callback_query_handler(func=lambda call: call.data in ['back', 'forward'])
 def handle_callback_query(call):
     user_id = call.from_user.id
     question_index = user_question_index[user_id]
