@@ -131,7 +131,7 @@ def add_admin(message):
 def get_admin(message):
     username = message.text
     usr_id = db.get_id(message.text)
-    db.add_user({"id":usr_id, "username":message.text, status:"admin", notif:1})
+    db.add_user({"id":usr_id, "username":message.text, "status":"admin", "notif":1})
     db.edit_rol(usr_id, "admin")
     bot.send_message(message.chat.id, f"Пользователь {username} стал администратором")
 
@@ -143,7 +143,10 @@ def add_dev(message):
 def get_dev(message):
     username = message.text
     usr_id = db.get_id(message.text)
-    db.add_user({"id":usr_id, "username":message.text, status:"dev", notif:1})
+    db.add_user({"id":usr_id, "username":message.text, "status":"dev", "notif":1})
     db.edit_rol(usr_id, "dev")
     bot.send_message(message.chat.id, f"Пользователь {username} стал супер-администратором")
+
+def notif_to_admin(user):
+
 bot.polling(none_stop=True)
