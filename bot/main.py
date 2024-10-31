@@ -1,4 +1,7 @@
+from gc import callbacks
+
 import telebot
+from pyexpat.errors import messages
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, \
     ReplyKeyboardRemove
 
@@ -11,6 +14,9 @@ from datetime import datetime, timedelta
 
 # dev
 from icecream import ic
+
+from gptgovno import user_message_ids
+
 # dev
 
 API_TOKEN = '7945741419:AAH1F1zVR4xlLfX6_HHt2V_HoWQO-qVv_zc' # ЗАМЕНИТЕ НА СВОЙ
@@ -33,7 +39,10 @@ excel_file = 'db/applicants.xlsx'
 
 user_answers = {}
 user_question_index = {}
-user_message_ids = {}
+user_message_ids_to_del = {}
+user_ids = {}
+users_is_poll = {}
+
 
 def notif_to_admin(user):
     notif_admins = db.get_notif()
@@ -111,12 +120,33 @@ def start(message):
 /info — 📃информация о вакансиях, которые Вас интересуют
 /status — 📊Статус, в котором Вы пребываете
 """)
+        ic(usr_id)
+        keyboard = InlineKeyboardMarkup()
+        keyboard.add(InlineKeyboardButton("Академия", callback_data='academy'))
+        keyboard.add(InlineKeyboardButton("Подать анкету", callback_data='poll'))
+        keyboard.add(InlineKeyboardButton("Информация о работе", callback_data='info_work'))
 
-    keyboard = InlineKeyboardMarkup()
-    keyboard.add(InlineKeyboardButton("Академия", callback_data='academy'))
-    keyboard.add(InlineKeyboardButton("Подать анкету", callback_data='poll'))
-    keyboard.add(InlineKeyboardButton("Информация о работе", callback_data='info_work'))
+        msg = bot.send_message(chat_id=message.chat.id, text='О чем вы хотите узнать дальше?', reply_markup=keyboard)
+        user_ids[msg.id] =  message.from_user.id
+        ic(msg.id)
 
+@bot.callback_query_handler(func = lambda callback: callback.data in ['academy', 'poll', 'info_work'])
+def new_step(callback):
+    if callback.data == 'academy':
+        bot.reply_to(message=callback.message, text='ТЕКСТ ПРО АКАДЕМИЮ')
+    elif callback.data == 'poll':
+        ic(callback.message.id)
+        user_id = user_ids[callback.message.id]
+        user_answers[user_id] = {}
+        user_answers[user_id]["username"] = "@" + db.get_user(user_id)['username']
+        current_date = datetime.now().date()
+        user_answers[user_id]["date"] = current_date
+        user_question_index[user_id] = 0  # Начинаем с первого вопроса
+        users_is_poll[user_id] = 1
+        ask_question(user_id)
+
+    elif callback.data == 'info_work':
+        bot.reply_to(message=callback.message, text='ТЕКСТ ИНФОРМОЦИЯ ПРО РАБОТУ')
 
 
 @bot.message_handler(func = lambda message:message.text == 'гойда'[0:len(message.text)])
@@ -250,6 +280,7 @@ def accepted(message):
     role = db.get_role(usr_id)
     # Здесь можно добавить логику для проверки, существует ли пользователь
     if role:  # Предполагаем, что есть такая функция
+        bot.send_message(message.chat.id, "Пользователь найден. Информация отправлена.")
         bot.send_message(db.get_user(usr_id)["chat_id"], "Ваша заявка была одобрена, с вами свяжутся позже.")
     else:
         bot.send_message(message.chat.id, "Пользователь не найден.")
@@ -304,7 +335,7 @@ def create_reply_keyboard(options):
         keyboard.add(KeyboardButton(option))
     return keyboard
 
-@bot.message_handler(commands=['poll'], func = lambda message: not db.is_admin(message.from_user.id))
+@bot.message_handler(commands=['poll'], func = lambda message: not db.is_admin(message.from_user.id) and not users_is_poll[message.from_user.id])
 def start_quiz(message):
     ic(message.from_user.username)
     user_id = message.from_user.id
@@ -340,15 +371,15 @@ def ask_question(user_id):
         # Добавляем инлайн-кнопки в отдельном сообщении
         inline_keyboard = create_inline_keyboard(question_index, len(questions))
         msg = bot.send_message(user_id, "Навигация:", reply_markup=inline_keyboard)
-        user_message_ids[user_id] = msg.message_id
+        user_message_ids_to_del[user_id] = msg.message_id
     else:
         bot.send_message(user_id, "Спасибо за участие! Ваши ответы: " + str(user_answers[user_id]))
         add_row_to_excel(file_path=excel_file, new_row=user_answers[user_id])
         del user_answers[user_id]
         del user_question_index[user_id]
-        del user_message_ids[user_id]
+        del user_message_ids_to_del[user_id]
 
-@bot.callback_query_handler(func=lambda call: True)
+@bot.callback_query_handler(func=lambda call: call.data)
 def handle_callback_query(call):
     user_id = call.from_user.id
     question_index = user_question_index[user_id]
@@ -377,9 +408,9 @@ def handle_response(message):
         # Сохраняем ответ
         user_answers[user_id][questions[user_question_index[user_id]][0]] = message.text
         user_question_index[user_id] += 1
-        if user_id in user_message_ids:
+        if user_id in user_message_ids_to_del:
             try:
-                bot.delete_message(chat_id=user_id, message_id=user_message_ids[user_id])
+                bot.delete_message(chat_id=user_id, message_id=user_message_ids_to_del[user_id])
             except Exception as e:
                 print(f"Ошибка при удалении сообщения: {e}")
         ask_question(user_id)
@@ -391,9 +422,9 @@ def handle_response(message):
 
         # Удаляем клавиатуру после получения ответа
         bot.send_message(user_id, "Спасибо за ваш ответ!", reply_markup=ReplyKeyboardRemove())
-        if user_id in user_message_ids:
+        if user_id in user_message_ids_to_del:
             try:
-                bot.delete_message(chat_id=user_id, message_id=user_message_ids[user_id])
+                bot.delete_message(chat_id=user_id, message_id=user_message_ids_to_del[user_id])
             except Exception as e:
                 print(f"Ошибка при удалении сообщения: {e}")
         ask_question(user_id)
