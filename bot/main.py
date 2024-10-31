@@ -89,6 +89,36 @@ def start(message):
     print(message.from_user.id, message.from_user.username)
     db.add_user({"id": str(message.from_user.id), "username": message.from_user.username, "status": "user", "notif": 1, "chat_id" : message.chat.id})
 
+    usr_id = message.from_user.id
+    db.edit_rol(usr_id, 'user')
+    if db.is_ban(usr_id):
+        bot.reply_to(message=message, text="Администрация ограничила вам доступ к данному боту.")
+    elif db.is_admin(usr_id):
+        ic(db.is_admin(usr_id))
+    else:
+        ic(usr_id)
+        with open('img/startimg1.png', 'rb') as photo:
+            bot.send_photo(photo=photo ,chat_id=message.chat.id, caption=
+"""
+Привет👋
+
+Вас приветствует бот команды Coffee Like!
+Здесь вы можете отправить свою анкету и попасть в нашу дружную команду. Если вы хотите работать у нас, но не достигли 18 лет узнайте про Академию Coffee Like.
+
+Доступные вам команды:
+
+/start — 😊Начало общения со мной
+/info — 📃информация о вакансиях, которые Вас интересуют
+/status — 📊Статус, в котором Вы пребываете
+""")
+
+    keyboard = InlineKeyboardMarkup()
+    keyboard.add(InlineKeyboardButton("Академия", callback_data='academy'))
+    keyboard.add(InlineKeyboardButton("Подать анкету", callback_data='poll'))
+    keyboard.add(InlineKeyboardButton("Информация о работе", callback_data='info_work'))
+
+
+
 @bot.message_handler(func = lambda message:message.text == 'гойда'[0:len(message.text)])
 def goida(message):
     bot.send_message(message.chat.id, 'гойда'[len(message.text):5])
