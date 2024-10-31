@@ -19,7 +19,7 @@ from gptgovno import user_message_ids
 
 # dev
 
-API_TOKEN = '7945741419:AAH1F1zVR4xlLfX6_HHt2V_HoWQO-qVv_zc' # ЗАМЕНИТЕ НА СВОЙ
+API_TOKEN = '7712920785:AAGLtViAA6H34GcDBBy896TCZX_mwwjM80M' # ЗАМЕНИТЕ НА СВОЙ
 bot = telebot.TeleBot(API_TOKEN)
 
 
@@ -230,7 +230,6 @@ def ban(message):
 
 def baned(message):
     usr_id = db.get_id(message.text)
-    is_push = db.is_notif(usr_id)
 
     role = db.get_role(usr_id)
     if role == None:

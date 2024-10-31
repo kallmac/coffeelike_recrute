@@ -1,4 +1,4 @@
-#пока это не правильный админ
+'''#пока это не правильный админ
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, \
     ReplyKeyboardRemove
@@ -131,3 +131,4 @@ bot.polling()
 db.commit()
 db.close()
 
+'''
