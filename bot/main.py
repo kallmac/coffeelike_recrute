@@ -5,8 +5,9 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeybo
 from config import UsersTable
 import os
 
-
 import pandas as pd
+
+from datetime import datetime, timedelta
 
 # dev
 from icecream import ic
@@ -37,7 +38,24 @@ def add_row_to_excel(file_path, new_row):
     # Сохраняем обновленный DataFrame обратно в Excel файл
     df.to_excel(file_path, index=False, engine='openpyxl')
 
+def filter_exel(date: datetime.date, input_file: str):
+    output_file = input_file.split('.')[0] + "_" + str(date) + ".xlsx"
 
+
+    # Чтение Excel файла
+    df = pd.read_excel(input_file)
+
+    # Убедитесь, что столбец с датами имеет правильный тип данных
+    # Замените 'date_column' на имя вашего столбца с датами
+    df['date_column'] = pd.to_datetime(df['date_column'], errors='coerce')
+
+    # Фильтрация строк, где дата больше 2 июня 2024 года
+    filtered_df = df[df['date'] >= date]
+
+    # Сохранение отфильтрованных данных в новый Excel файл
+    filtered_df.to_excel(output_file, index=False)
+
+    return output_file
 
 questions = [
     ("Как вас зовут?", 0),  # Открытый вопрос
@@ -77,13 +95,28 @@ def get_table(message):
     week = InlineKeyboardButton(text='Месяц', callback_data='week')
     mounth = InlineKeyboardButton(text='Неделя', callback_data='mounth')
     year = InlineKeyboardButton(text='Год', callback_data='year')
-    kb.add(week, mounth, year)
+    all_data = InlineKeyboardButton(text='Все', callback_data='all')
+
+    kb.add(week, mounth, year, all_data)
     bot.send_message(message.chat.id, "Таблицу за какой срок ты хочешь?", reply_markup=kb) #спрашиваем период
 
 @bot.callback_query_handler(func = lambda callback: callback.message.text == "Таблицу за какой срок ты хочешь?") #если нажали на кнопку
 def table(callback):
-    week_table = os.read('D:/Project/pyCharm/coffeelike_recrute/bot/db', 'rb')
-    bot.send_document(callback.message.chat.id, week_table)
+    date_to_days = {'week': 7, 'mounth' : 30, 'year': 365}
+    if callback.data == 'all':
+        with open('db/applicants.xlsx', 'rb') as file:
+            bot.send_document(chat_id=callback.from_chat.id, data=file)
+
+    else:
+        new_date = datetime.now().date() - timedelta(days=date_to_days[callback.data])
+        filter_file = filter_exel(input_file='db/applicants.xlsx', date=date_to_days)
+        with open(filter_file, 'rb') as file:
+            bot.send_document(chat_id=callback.from_chat.id, data=file)
+        try:
+            os.remove(filter_file)
+            print(f"Файл {filter_file} успешно удален.")
+        except Exception as e:
+            print(f"Ошибка при удалении файла: {e}")
 
 @bot.message_handler(commands=['notification'], func= lambda message: db.is_admin(message.from_user.id)) #уведомления
 def pushes(message):
@@ -114,7 +147,7 @@ def change_push(callback):
     else:
         is_push = False
         bot.send_message(callback.message.chat.id, 'Уведомления выключены!')
-    db.is_notif(usr_id, is_push)
+    db.edit_notif(usr_id=usr_id,a=is_push)
 
 @bot.message_handler(commands = ['ban'], func = lambda message: db.is_admin(message.from_user.id) or db.is_dev(message.from_user.id)) #ну бан
 def ban(message):
@@ -142,7 +175,7 @@ def baned(message):
         unban = InlineKeyboardButton(text='Да', callback_data=f'unban_{message.text}')
         kb.add(unban, esc)
         bot.send_message(message.chat.id, "Пользователь забанен. Желаете разбанить?", reply_markup=kb)
-    elif(role == 'admin' or role == 'dev'):
+    elif role == 'admin' or role == 'dev':
         bot.send_message(message.chat.id, "Пользователь является админом, вы не можете его заблокировать")
     else:
         bot.send_message(message.chat.id, "Пользователь не найден в базе данных")
@@ -185,7 +218,9 @@ def create_reply_keyboard(options):
 def start_quiz(message):
     user_id = message.from_user.id
     user_answers[user_id] = {}
-    user_answers[user_id]["username"] = message.from_user.username
+    user_answers[user_id]["username"] = "@" + message.from_user.username
+    current_date = datetime.now().date()
+    user_answers[user_id]["date"] = current_date
     user_question_index[user_id] = 0  # Начинаем с первого вопроса
     ask_question(user_id)
 
@@ -202,7 +237,6 @@ def ask_question(user_id):
                 bot.send_message(user_id, question)
 
         else:  # Закрытый вопрос
-
             ic(questions[question_index][0])
             ic(user_answers[user_id].keys())
 
