@@ -18,6 +18,7 @@ class UsersTable:
         conn.commit()
         cur.close()
         conn.close()
+
     def del_user(self, usr_id):
         # Открываем соединение с базой данных
         conn = sqlite3.connect('db/everyone.sql')
@@ -26,6 +27,7 @@ class UsersTable:
         conn.commit()
         cur.close()
         conn.close()
+
     def get_user(self, usr_id: int) -> dict:
         conn = sqlite3.connect('db/everyone.sql')
         cur = conn.cursor()
@@ -94,7 +96,7 @@ class UsersTable:
         else:
             return False
 
-    def is_notif(self, usr_id):
+    def is_notif(self, usr_id: object) -> bool:
         conn = sqlite3.connect('db/everyone.sql')
         cur = conn.cursor()
         cur.execute(f'SELECT notif FROM everyone WHERE tg_id = ?', (usr_id,))

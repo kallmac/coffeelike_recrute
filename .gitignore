@@ -2,4 +2,9 @@
 .gitignore
 .venv
 bot/db/everyone.sql
-bot/db/everyone.sql
+test.py
+test2.py
+testconfig.py
+users.py
+gptgovno.py
+data.xlsx
