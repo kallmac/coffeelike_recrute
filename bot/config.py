@@ -121,7 +121,7 @@ class UsersTable:
         if (usr_id):
             return usr_id[0]
         return None
-    def get_notif(self, user):
+    def get_notif(self):
         conn = sqlite3.connect('db/everyone.sql')
         cur = conn.cursor()
         cur.execute("SELECT chat_id FROM everyone WHERE (notif = 1 AND (status = 'admin' OR status = 'dev'))")

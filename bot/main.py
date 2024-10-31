@@ -20,6 +20,28 @@ bot = telebot.TeleBot(API_TOKEN)
 
 # user
 
+db = UsersTable()
+
+questions = [
+    ("Как вас зовут?", 0),  # Открытый вопрос
+    ("Какой ваш любимый цвет?", ["Красный", "Синий", "Зеленый"]),  # Закрытый вопрос
+    ("Какой ваш любимый фильм?", 0),  # Открытый вопрос
+    ("Какой ваш любимый вид спорта?", ["Футбол", "Баскетбол", "Теннис"]),  # Закрытый вопрос
+]
+
+excel_file = 'db/applicants.xlsx'
+
+user_answers = {}
+user_question_index = {}
+user_message_ids = {}
+
+def notif_to_admin(user):
+    notif_admins = db.get_notif()
+    for cht_id in notif_admins:
+        cht_id = cht_id[0]
+        bot.send_message(cht_id, f"Пользователь {user} оставил вакансию бариста")
+
+
 def add_row_to_excel(file_path, new_row):
     if not os.path.exists(file_path):
 
@@ -47,7 +69,7 @@ def filter_exel(date: datetime.date, input_file: str):
 
     # Убедитесь, что столбец с датами имеет правильный тип данных
     # Замените 'date_column' на имя вашего столбца с датами
-    df['date_column'] = pd.to_datetime(df['date_column'], errors='coerce')
+    df['date'] = pd.to_datetime(df['date'], errors='coerce')
 
     # Фильтрация строк, где дата больше 2 июня 2024 года
     filtered_df = df[df['date'] >= date]
@@ -57,33 +79,24 @@ def filter_exel(date: datetime.date, input_file: str):
 
     return output_file
 
-questions = [
-    ("Как вас зовут?", 0),  # Открытый вопрос
-    ("Какой ваш любимый цвет?", ["Красный", "Синий", "Зеленый"]),  # Закрытый вопрос
-    ("Какой ваш любимый фильм?", 0),  # Открытый вопрос
-    ("Какой ваш любимый вид спорта?", ["Футбол", "Баскетбол", "Теннис"]),  # Закрытый вопрос
-]
-
-excel_file = 'db/applicants.xlsx'
-
-user_answers = {}
-user_question_index = {}
-user_message_ids = {}
 
 # user
 
 # all users
 
+@bot.message_handler(commands= ['start'])
+def start(message):
+    print(message.from_user.id, message.from_user.username)
+    db.add_user({"id": str(message.from_user.id), "username": message.from_user.username, "status": "user", "notif": 1, "chat_id" : message.chat.id})
+
+@bot.message_handler(func = lambda message:message.text == 'гойда'[0:len(message.text)])
+def goida(message):
+    bot.send_message(message.chat.id, 'гойда'[len(message.text):5])
 
 
 # all users
 
-db = UsersTable()
 
-@bot.message_handler(commands= ['start'])
-def start(message):
-    print(message.from_user.id, message.from_user.username)
-    db.add_user({"id": str(message.from_user.id), "username": message.from_user.username, "status": "user", "notif": 1})
 
 
 # admin
@@ -103,15 +116,15 @@ def get_table(message):
 @bot.callback_query_handler(func = lambda callback: callback.message.text == "Таблицу за какой срок ты хочешь?") #если нажали на кнопку
 def table(callback):
     date_to_days = {'week': 7, 'mounth' : 30, 'year': 365}
-    if callback.data == 'all':
+    if callback.data != 0:
         with open('db/applicants.xlsx', 'rb') as file:
-            bot.send_document(chat_id=callback.from_chat.id, data=file)
+            bot.send_document(chat_id=callback.message.chat.id, document=file)
 
     else:
         new_date = datetime.now().date() - timedelta(days=date_to_days[callback.data])
         filter_file = filter_exel(input_file='db/applicants.xlsx', date=date_to_days)
         with open(filter_file, 'rb') as file:
-            bot.send_document(chat_id=callback.from_chat.id, data=file)
+            bot.send_document(chat_id=callback.from_chat.id, document=file)
         try:
             os.remove(filter_file)
             print(f"Файл {filter_file} успешно удален.")
@@ -183,18 +196,65 @@ def baned(message):
 
 @bot.callback_query_handler(func = lambda callback : callback.data.split('_')[0] == 'ban')
 def ban(callback):
-    usr_id = callback.from_user.id
-    is_push = db.is_notif(usr_id)
+    usr_id = db.get_id(callback.data.split('_')[1])
+    ic(usr_id)
     db.edit_rol(usr_id=usr_id, role='ban')
     bot.send_message(callback.message.chat.id, "Пользователь заблокирован!")
 
 
 @bot.callback_query_handler(func = lambda callback : callback.data.split('_')[0] == 'unban')
 def unban(callback):
-    usr_id = callback.from_user.id
-    is_push = db.is_notif(usr_id)
+    usr_id = db.get_id(callback.data.split('_')[1])
     db.edit_rol(usr_id=usr_id, role='user')
     bot.send_message(callback.message.chat.id, "Пользователь разблокирован!")
+
+
+
+@bot.message_handler(commands=['agree'], func=lambda message: db.is_admin(message.from_user.id) or db.is_dev(message.from_user.id))
+def accept(message):
+    sent = bot.send_message(message.chat.id, "Кого одобряем?")
+    bot.register_next_step_handler(sent, accepted)  # ждём ответа
+
+def accepted(message):
+    usr_id = db.get_id(message.text)  # Предполагаем, что пользователь вводит ID или имя
+    role = db.get_role(usr_id)
+    # Здесь можно добавить логику для проверки, существует ли пользователь
+    if role:  # Предполагаем, что есть такая функция
+        bot.send_message(db.get_user(usr_id)["chat_id"], "Ваша заявка была одобрена, с вами свяжутся позже.")
+    else:
+        bot.send_message(message.chat.id, "Пользователь не найден.")
+
+
+@bot.message_handler(commands = ['add_admin'], func= lambda message: db.is_dev(message.from_user.id))
+def add_admin(message):
+    sent = bot.send_message(message.chat.id, "Кого?")
+    bot.register_next_step_handler(sent, admin)
+def admin(message):
+    username = message.text
+    id = db.get_id(username)
+    role = db.get_role(id)
+    if(not role):
+        bot.send_message(message.chat.id, "Нет в бд")
+        return
+    db.edit_rol(id, 'admin')
+    db.edit_notif(id, 1)
+    bot.send_message(message.chat.id, "теперь админ")
+
+@bot.message_handler(commands = ['add_dev'], func= lambda message: db.is_dev(message.from_user.id))
+def add_dev(message):
+    sent = bot.send_message(message.chat.id, "Кого?")
+    bot.register_next_step_handler(sent, dev)
+def dev(message):
+    username = message.from_user.username
+    id = message.from_user.id
+    role = db.get_role(id)
+    if(not role):
+        bot.send_message(message.chat.id, "Нет в бд")
+        return
+    db.edit_rol(id, 'dev')
+    db.edit_notif(id, 1)
+    bot.send_message(message.chat.id, "теперь супер-админ")
+
 
 # admin
 
@@ -216,6 +276,7 @@ def create_reply_keyboard(options):
 
 @bot.message_handler(commands=['poll'], func = lambda message: not db.is_admin(message.from_user.id))
 def start_quiz(message):
+    ic(message.from_user.username)
     user_id = message.from_user.id
     user_answers[user_id] = {}
     user_answers[user_id]["username"] = "@" + message.from_user.username
@@ -308,5 +369,7 @@ def handle_response(message):
         ask_question(user_id)
 
 # user
+
+
 
 bot.polling(none_stop=True)
