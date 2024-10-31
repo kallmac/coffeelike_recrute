@@ -2,22 +2,20 @@ import sqlite3
 
 conn = sqlite3.connect('db/everyone.sql')
 cur = conn.cursor()
-cur.execute('CREATE TABLE IF NOT EXISTS everyone (id int auto_increment primary key, tg_id varchar(255), tg_username varchar(255), status varchar(255), notif int)')
+cur.execute('CREATE TABLE IF NOT EXISTS everyone (id int auto_increment primary key, tg_id varchar(255), tg_username varchar(255), status varchar(255), notif int, chat_id int)')
 conn.commit()
 cur.close()
 conn.close()
-del conn
-del cur
 
 class UsersTable:
     def add_user(self, usr_data: dict):
         conn = sqlite3.connect('db/everyone.sql')
         cur = conn.cursor()
-        cur.execute('SELECT EXISTS(SELECT everyone WHERE tg_id = ?)', usr_data['id'])
-        existing = cur.fetchone()
+        cur.execute('SELECT EXISTS(SELECT tg_id FROM everyone WHERE tg_id = ?)', (usr_data['id'],))
+        existing = cur.fetchone()[0]
         if not existing:
-            cur.execute('INSERT INTO everyone (tg_id, tg_username, status, notif) VALUES(?, ?, ?, ?)',
-                        (usr_data["id"], usr_data["username"], usr_data["status"], usr_data["notif"]))
+            cur.execute('INSERT INTO everyone (tg_id, tg_username, status, notif, chat_id) VALUES(?, ?, ?, ?, ?)',
+                        (usr_data["id"], usr_data["username"], usr_data["status"], usr_data["notif"], usr_data["chat_id"]))
         conn.commit()
         cur.close()
         conn.close()
@@ -43,61 +41,34 @@ class UsersTable:
         user_dict = {'id': user_info[1],
              'username': user_info[2],
              'status': user_info[3],
-             'notif': user_info[4]}
+             'notif': user_info[4],
+             'chat_id': user_info[5]
+                     }
         return user_dict # возвращает словарь с инф ой о пользователе
 
     def is_dev(self, usr_id) -> bool:
-        conn = sqlite3.connect('db/everyone.sql')
-        cur = conn.cursor()
-        cur.execute('SELECT status FROM everyone WHERE tg_id = ?', (usr_id,))
-        rol = cur.fetchone()[0]
-        conn.commit()
-        cur.close()
-        conn.close()
-        if (rol == 'dev'):
+        role = self.get_role(usr_id)
+        if(role=='dev'):
             return True
-        else:
-            return False
+        return False
 
     def is_admin(self, usr_id) -> bool:
-        conn = sqlite3.connect('db/everyone.sql')
-        cur = conn.cursor()
-        cur.execute('SELECT status FROM everyone WHERE tg_id = ?', (usr_id,))
-        rol = cur.fetchone()
-        conn.commit()
-        cur.close()
-        conn.close()
-
-        if rol=='admin' or rol=='dev':
+        role = self.get_role(usr_id)
+        if (role == 'dev' or role == 'admin'):
             return True
-        else:
-            return False
+        return False
 
     def is_user(self, usr_id) -> bool:
-        conn = sqlite3.connect('db/everyone.sql')
-        cur = conn.cursor()
-        cur.execute('SELECT status FROM everyone WHERE tg_id = ?', (usr_id,))
-        rol = cur.fetchone()[0]
-        conn.commit()
-        cur.close()
-        conn.close()
-        if (rol == 'user' or rol == 'dev'):
+        role = self.get_role(usr_id)
+        if (role == 'dev' or role == 'user'):
             return True
-        else:
-            return False
+        return False
 
     def is_ban(self, usr_id) -> bool:
-        conn = sqlite3.connect('db/everyone.sql')
-        cur = conn.cursor()
-        cur.execute('SELECT status FROM everyone WHERE tg_id = ?', (usr_id,))
-        rol = cur.fetchone()[0]
-        conn.commit()
-        cur.close()
-        conn.close()
-        if (rol == 'ban'):
+        role = self.get_role(usr_id)
+        if (role == 'ban'):
             return True
-        else:
-            return False
+        return False
 
     def is_notif(self, usr_id: object) -> bool:
         conn = sqlite3.connect('db/everyone.sql')
@@ -150,4 +121,13 @@ class UsersTable:
         if (usr_id):
             return usr_id[0]
         return None
+    def get_notif(self, user):
+        conn = sqlite3.connect('db/everyone.sql')
+        cur = conn.cursor()
+        cur.execute("SELECT chat_id FROM everyone WHERE (notif = 1 AND (status = 'admin' OR status = 'dev'))")
+        table = cur.fetchall()
+        conn.commit()
+        cur.close()
+        conn.close()
+        return table
 
