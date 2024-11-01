@@ -1,6 +1,4 @@
-
 import telebot
-from pyexpat.errors import messages
 
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, \
     ReplyKeyboardRemove
@@ -554,9 +552,9 @@ def handle_response(message):
         user_answers[user_id][questions[user_question_index[user_id]][0]] = message.text
 
         user_question_index[user_id] += 1
-
+        bot.send_message(user_id ,text='Ваш ответ принят❇️', reply_markup=ReplyKeyboardRemove())
         # Удаляем клавиатуру после получения ответа
-        bot.send_message(user_id, "Спасибо за ваш ответ!", reply_markup=ReplyKeyboardRemove())
+        #bot.send_message(user_id, "Спасибо за ваш ответ!", reply_markup=ReplyKeyboardRemove())
         if user_id in user_message_ids_to_del:
             try:
                 bot.delete_message(chat_id=user_id, message_id=user_message_ids_to_del[user_id])
