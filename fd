@@ -1,0 +1,500 @@
+[33mcommit 03d01a6a45b3f1522721696f5ebc2e682dcf551b[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Fri Nov 1 11:53:47 2024 +0300
+
+    fdsffsd
+
+[33mcommit c5809c5a1b29a23fcc40d309ac290da39c582c1f[m
+Merge: 0f4716a e799dce
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Fri Nov 1 11:53:15 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+    
+    # Conflicts:
+    #       bot/main.py
+
+[33mcommit e799dce55badcc2d881a9f9f36d64c88d7e98294[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Fri Nov 1 11:43:28 2024 +0300
+
+    Добавил agree и notif
+
+[33mcommit dd457c39a0fbafd3a4bb92fb22826036fa83b17a[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Fri Nov 1 10:35:17 2024 +0300
+
+    Добавил agree и notif
+
+[33mcommit 0f4716aeafedb41097bb9fb4e904348a72013d6e[m
+Merge: 530b45a 3780966
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Fri Nov 1 10:30:29 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit 3780966b22aefd346d5d69bdfdfe6ff8e0914ade[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Fri Nov 1 10:29:38 2024 +0300
+
+    Добавил agree и notif
+
+[33mcommit 530b45a4d4cef1e7289f23c4d19c710d8c075250[m
+Merge: 690db6c 7ed09b0
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Fri Nov 1 10:27:19 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+    
+    # Conflicts:
+    #       bot/main.py
+
+[33mcommit 690db6cd417dcf15fee2b77514873e0cd158ced4[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Fri Nov 1 10:23:14 2024 +0300
+
+    сосать1
+
+[33mcommit 7ed09b04adaa463bacee6c18fdc39fbcec0b59c5[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Fri Nov 1 10:22:31 2024 +0300
+
+    Добавил agree и notif
+
+[33mcommit 0bd3bedf2113834467cff23f26f7f8d2404e329f[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Fri Nov 1 09:53:55 2024 +0300
+
+    Добавил agree и notif
+
+[33mcommit 6039d553850db395b95cc9cf7d481c49de17e88d[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Fri Nov 1 09:29:09 2024 +0300
+
+    Добавил agree и notif
+
+[33mcommit d86db88d2ead2347f39c48506e23aa0484345d38[m
+Merge: 718a2bd 488ac9a
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Fri Nov 1 01:46:57 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+    
+    # Conflicts:
+    #       bot/main.py
+
+[33mcommit 718a2bd4a5af4b280e7471a8510dfaacae70b3fe[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Fri Nov 1 01:46:10 2024 +0300
+
+    ВСЁЁ 2аавыывмаваыв
+
+[33mcommit e66c7c29e797d6332ba6fe2fe48830104932cd24[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Fri Nov 1 01:43:23 2024 +0300
+
+    ВСЁЁ 2аыв
+
+[33mcommit 488ac9afe386296f0fbf3f778f92eeef42d84efb[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Fri Nov 1 01:04:22 2024 +0300
+
+    Добавил agree и notif
+
+[33mcommit b25d44cfe09fafe3940e05e6310671fd9ad30701[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Fri Nov 1 00:57:30 2024 +0300
+
+    Добавил agree и notif
+
+[33mcommit 7de3e53daec69d9773da987386497d39ea60cc3a[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Fri Nov 1 00:28:36 2024 +0300
+
+    Добавил agree и notif
+
+[33mcommit 2f5dfca273db6a429586aa2b6260203c69cd3c61[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Fri Nov 1 00:15:34 2024 +0300
+
+    Добавил agree и notif
+
+[33mcommit ddf9538d81da379c07fbad7e1964eaff1f3cd8b8[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Thu Oct 31 13:58:59 2024 +0300
+
+    Добавил agree и notif
+
+[33mcommit 9cfb0480e11e837eb78a3d125b9428c8c6697a5c[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Thu Oct 31 13:12:52 2024 +0300
+
+    последний коммит андрей 52
+
+[33mcommit a1bbb507db0edbfd92504fe4259c9766db40fa97[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Thu Oct 31 11:16:30 2024 +0300
+
+    gfdsgdsfgdsf
+
+[33mcommit 40f832ec4be5f9af31ed39449ded0d8b824366b3[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Thu Oct 31 23:50:09 2024 +0300
+
+    ВСЁЁ 2
+
+[33mcommit c0ec15b150a86f21fca9cccad6ea61a8e961041e[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Thu Oct 31 15:16:58 2024 +0300
+
+    ВСЁЁ
+
+[33mcommit 43c35ebd2b6f13dcd11db1538d7ff24941abe6da[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Thu Oct 31 14:32:30 2024 +0300
+
+    МОЯ ГОЙДА 1
+
+[33mcommit 16789b32cf7a4298daf82c1266bedca1be628aa7[m
+Merge: 34866fb 5d51c1d
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Thu Oct 31 12:00:13 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit 34866fb6e69b410b9a0e4ed4fa90939fd0ba4719[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Thu Oct 31 11:59:52 2024 +0300
+
+    МОЯ ГОЙДА 1
+
+[33mcommit 5d51c1d10fe271be1f3014827d69fd32ec2e3bfa[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Thu Oct 31 11:06:46 2024 +0300
+
+    последний коммит андрей 52
+
+[33mcommit eb172dc316964063d1693894179e72bfad0e8b56[m
+Merge: 4b6b8d5 898bce7
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Thu Oct 31 10:37:15 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+    
+    # Conflicts:
+    #       bot/main.py
+
+[33mcommit 4b6b8d578fbbc319af4b5d4ca7ad45d20e3943bb[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Thu Oct 31 10:36:45 2024 +0300
+
+    GOIDA GOIDA 2 2
+
+[33mcommit 898bce7c54097431440cf05bcd8dc7dea5b6bf2f[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Thu Oct 31 09:10:42 2024 +0300
+
+    последний коммит андрей 52
+
+[33mcommit 7b8de87203b0612ebee995027425b8a5b54478bf[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 23:24:44 2024 +0300
+
+    последний коммит андрей 52
+
+[33mcommit 7c8b4069faa1044efd2e2dfa4467edaac1a73c81[m
+Author: Gas <artem_zelenskiy_07@mail.ru>
+Date:   Wed Oct 30 22:56:02 2024 +0300
+
+    Config: add_user - исправление
+
+[33mcommit df79ee12f23c7544998a6129339dba50cf22eacd[m
+Merge: 0099939 0ff3305
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Wed Oct 30 17:53:51 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+    
+    # Conflicts:
+    #       bot/config.py
+
+[33mcommit 0099939d7c70d712eeb8ec68207a9c62f43f988b[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Wed Oct 30 17:53:11 2024 +0300
+
+    fsdfgfdsgdsfgdfs GOIDA GOIDA
+
+[33mcommit 0ff33052f429c5ed20cd40dc5a784f27d9c8dbec[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 17:52:25 2024 +0300
+
+    последний коммит андрей 52
+
+[33mcommit d6863241b07c40fbd4318811f27a6e32dcf2a06b[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 17:20:22 2024 +0300
+
+    последний коммит андрей 52
+
+[33mcommit 0c4a7c2e689e37785b7cf242f896b076c7fcab66[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 17:14:27 2024 +0300
+
+    последний коммит андрей 1
+
+[33mcommit 2f5ce9b3923e09d78584d70842e55dc981289423[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 17:08:27 2024 +0300
+
+    последний коммит андрей 1
+
+[33mcommit 7cf328b11c54c79568162ad081b8d34dfad96306[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 15:22:04 2024 +0300
+
+    последний коммит андрей 1
+
+[33mcommit a87d96632d0cf6a84b44e4cbf5bd7ca17648b899[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Wed Oct 30 17:04:44 2024 +0300
+
+    admin in main.py
+
+[33mcommit fa0937109574031d3a5be77695e1ba5b5fa3fbdb[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 15:11:53 2024 +0300
+
+    последний коммит андрей 1
+
+[33mcommit b439017238363d3172b70a910374318ece1d1050[m
+Merge: ebd16fa 95cfb50
+Author: Gas <artem_zelenskiy_07@mail.ru>
+Date:   Wed Oct 30 14:06:02 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit ebd16fa527deb1e1f44c172159bf83d2cad99479[m
+Author: Gas <artem_zelenskiy_07@mail.ru>
+Date:   Wed Oct 30 14:05:39 2024 +0300
+
+    Config: add_user; get user
+
+[33mcommit 95cfb50048abecbac6a0abe5f77cc1d10a009bd9[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 13:56:35 2024 +0300
+
+    последний коммит андрей 1
+
+[33mcommit 2c88c7c24d80b590032844b4198f0ad1748e1bf9[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 13:33:53 2024 +0300
+
+    последний коммит андрей 1
+
+[33mcommit e4a3eb116a451384180fe99372ebe97244d54858[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Wed Oct 30 13:23:01 2024 +0300
+
+    UsersTable
+
+[33mcommit 1a299df58b67fad3096849c4656d1df45810baf5[m
+Merge: c377675 3a623f2
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 11:57:48 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+    
+    # Conflicts:
+    #       bd_main.py
+    #       everyone.sql
+
+[33mcommit c377675b896998e35e5b1a592a9076438155c134[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 11:57:13 2024 +0300
+
+    последний коммит андрей 1
+
+[33mcommit caf6bad5cfad068858a9a85142c646325939a5dc[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 11:53:17 2024 +0300
+
+    ну это админ
+
+[33mcommit 3a623f2c37ffec2ebe81da180c845c377d9a9768[m
+Author: Gas <artem_zelenskiy_07@mail.ru>
+Date:   Wed Oct 30 11:46:20 2024 +0300
+
+    новая бд для вообще всех
+
+[33mcommit 09007fe86c19a4890578799f74bbc7f6a4ee895f[m
+Merge: d4f0ef4 3f8353f
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 11:46:36 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit d4f0ef40cab3e36e877e537e039e4855ae40a63f[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 11:37:44 2024 +0300
+
+    ну это админ
+
+[33mcommit 3f8353f553bb4afde23efc4f0397108b706ab21a[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Wed Oct 30 11:31:14 2024 +0300
+
+    добавил requirements.txt
+
+[33mcommit 9339ec1d6246ea3ba6d4ccf74fd45881abb29851[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 11:13:58 2024 +0300
+
+    ну это админ
+
+[33mcommit d9e9c3f9a1f8477569d212708c11aeaf7a2ed704[m
+Merge: 42d4a2a ab3b391
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 11:13:15 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit ab3b391d609575c81141944eb4898049a601e877[m
+Merge: 9cc44ee 3268081
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Wed Oct 30 11:12:03 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit 9cc44ee5de2a7e4a59a5df2ba2278fc1338a11c3[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Wed Oct 30 11:11:37 2024 +0300
+
+    нормальная версия опроса
+
+[33mcommit 42d4a2a717f58ae8948f47186c8abc64e05a18cd[m
+Merge: 9c46758 3268081
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 10:29:33 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit 326808126f8227edc1630ce072d81feafbdf5503[m
+Merge: ee4e223 c123d71
+Author: Gas <artem_zelenskiy_07@mail.ru>
+Date:   Wed Oct 30 10:25:53 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit ee4e223a4d281c4170d93d3b03a928ee6008c38f[m
+Author: Gas <artem_zelenskiy_07@mail.ru>
+Date:   Wed Oct 30 09:54:14 2024 +0300
+
+    новая бд для вообще всех
+
+[33mcommit 9c467583843784d7f5a2fc607b6ee1fd824f60c5[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 10:14:56 2024 +0300
+
+    ну это админ
+
+[33mcommit c123d712e5de33114cba0815e176fb71ad5f03dd[m
+Merge: 47566fe 3cd4965
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 10:14:31 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit 3cd4965ebc3f5fd9e16a52caa0ce09157eff338c[m
+Author: Gas <artem_zelenskiy_07@mail.ru>
+Date:   Wed Oct 30 09:54:14 2024 +0300
+
+    БАН
+
+[33mcommit 47566fe357c7595bec3d302ab27cb5ccffa2ed6e[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Wed Oct 30 09:00:49 2024 +0300
+
+    ну это админ
+
+[33mcommit a292c10a3ea4b1ced7d5742ae52625d76dbedd45[m
+Author: Gas <artem_zelenskiy_07@mail.ru>
+Date:   Tue Oct 29 17:59:05 2024 +0300
+
+    исправил созд. бд и добавил sqlite бд-и банов
+
+[33mcommit cb778e541a8354fd6490ba135823d9583fe38154[m
+Author: Andrey <aslashkin2010@gmail.com>
+Date:   Tue Oct 29 16:08:27 2024 +0300
+
+    ну это админ
+
+[33mcommit e4bc2ef348a44bd5991077788479e19f7031b3dd[m
+Author: Gas <artem_zelenskiy_07@mail.ru>
+Date:   Tue Oct 29 13:49:21 2024 +0300
+
+    исправил созд. бд и добавил sqlite бд-и для админов и dev-ов
+
+[33mcommit 98a0548a8bbe8e0be920e6f2127915c5cfd46e26[m
+Author: Gas <artem_zelenskiy_07@mail.ru>
+Date:   Tue Oct 29 10:27:48 2024 +0300
+
+    создал базу данных vjkjlxbyfff
+
+[33mcommit 0526baeac652d65528638050cd08ca343db7ffd1[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Mon Oct 28 21:07:57 2024 +0300
+
+    вторая версия системы опроса
+
+[33mcommit 293a8e1e1cff684717baa33b0d40eba3f9cb5fd8[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Mon Oct 28 20:29:17 2024 +0300
+
+    первая версия системы опроса
+
+[33mcommit 2a0ac08aba172f3954386040d051abbe5a04f1ed[m
+Merge: 4988430 8f7168d
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Mon Oct 28 13:02:35 2024 +0300
+
+    Merge remote-tracking branch 'origin/main'
+
+[33mcommit 49884305158d07c962d0f5f88f86fb9c20b0daef[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Mon Oct 28 11:49:55 2024 +0300
+
+    add some documentation in readme 2
+
+[33mcommit 8f7168d5de95ee2a8b8c1f53699653f832825d16[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Mon Oct 28 11:28:36 2024 +0300
+
+    Update README.md
+
+[33mcommit c5cc987cdeefa0ad6c768a1b461957657551135f[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Mon Oct 28 10:59:06 2024 +0300
+
+    Update README.md
+    
+    мавфываф
+
+[33mcommit b50c12845d6a27ddce06189ba19cfff744d34e06[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Mon Oct 28 10:53:29 2024 +0300
+
+    Update README.md
+    
+    авыа
+
+[33mcommit 248a3291f448b9f0113f02172ac0f1a8dbf56d17[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Mon Oct 28 10:45:42 2024 +0300
+
+    add some documentation in readme
+
+[33mcommit 38c2513a863ff25df4891d475d112df5d6789797[m
+Author: kallmac <124498434+kallmac@users.noreply.github.com>
+Date:   Sun Oct 27 20:23:43 2024 +0300
+
+    Initial commit

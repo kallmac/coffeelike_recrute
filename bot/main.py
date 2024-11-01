@@ -1,7 +1,6 @@
-from gc import callbacks
 
 import telebot
-from pyexpat.errors import messages
+
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, \
     ReplyKeyboardRemove
 
@@ -15,7 +14,6 @@ from datetime import datetime, timedelta
 # dev
 from icecream import ic
 
-#from gptgovno import user_message_ids
 
 # dev
 
@@ -33,6 +31,7 @@ questions = [
     ("ФИО: 📝", 0),  # Закрытый вопрос
     ("Гражданство: 🌍", 0),  # Открытый вопрос
     ("Город проживания: 🏙️", ["Нижний Новгород", "Киров", "Владимир", "Саратов", "Ижевск"]),
+    ("Твой ник в телеграме (в формате @Name123): 📱", 0),
     ("Контактный номер телефона: 📞", 0),
     ("Количество полных лет: 🎂", 0),
     ("Форма обучения: 🎓", ["Очная", "Очно-заочная", "Заочная", "Не обучаюсь"]),
@@ -48,11 +47,11 @@ questions = [
     "Переезд",
     "Не работал/а ранее",
     "Другое"]),
-    ("Желаемый график работы? ⏰", ["5/2", "2/2", "3/2", "2/3"]),
+    ("Желаемый график работы? ⏰", 0),
     ("Желаемый уровень заработной платы? 💰", 0),
     ("На какой период ищешь работу? 📅", 0),
     ("Район города, в котором тебе будет удобно работать (можешь указать несколько): 📍", 0),
-    ("Это последний вопрос! Как вы узнали о нашей вакансии? 🔍",
+    ("Как узнали о нашей вакансии? 🔍",
      ["hh.ru",
     "Авито",
     "От друзей",
@@ -69,7 +68,7 @@ user_answers = {}
 user_question_index = {}
 user_message_ids_to_del = {}
 user_ids = {}
-users_is_poll = {}
+users_is_poll = set()
 
 
 def notif_to_admin(user):
@@ -120,15 +119,8 @@ def filter_exel(date: datetime.date, input_file: str):
 # user
 
 # all users
-@bot.message_handler(func = lambda message : db.is_ban(message.from_user.id))
-def ban_message(message):
-    bot.send_sticker(message.chat.id, "CAACAgIAAxkBAAENDdZnJJCjQasN787Pv9mEBT7gBZLfxwACR1YAAtTAGEntuLbdzn-UrTYE")
-    bot.reply_to(message=message, text="Администрация ограничила вам доступ к данному боту.")
-@bot.callback_query_handler(func = lambda callback : db.is_ban(callback.from_user.id))
-def ban_callback(callback):
-    bot.send_sticker(callback.message.chat.id, "CAACAgIAAxkBAAENDdZnJJCjQasN787Pv9mEBT7gBZLfxwACR1YAAtTAGEntuLbdzn-UrTYE")
-    bot.reply_to(message=callback.message, text="Администрация ограничила вам доступ к данному боту.")
-@bot.message_handler(commands= ['start'])
+
+@bot.message_handler(commands= ['start', 'info'], func = lambda message: not message.from_user.id in users_is_poll)
 def start(message):
     print(message.from_user.id, message.from_user.username)
     db.add_user({"id": str(message.from_user.id), "username": message.from_user.username, "status": "user", "notif": 1, "chat_id" : message.chat.id})
@@ -136,21 +128,46 @@ def start(message):
     usr_id = message.from_user.id
     db.edit_rol(usr_id, 'user')
     if db.is_ban(usr_id):
-        bot.send_sticker(message.chat.id, "CAACAgIAAxkBAAENDdZnJJCjQasN787Pv9mEBT7gBZLfxwACR1YAAtTAGEntuLbdzn-UrTYE")
         bot.reply_to(message=message, text="Администрация ограничила вам доступ к данному боту.")
     elif db.is_admin(usr_id):
-        ic(db.is_admin(usr_id))
+        hi_text_admin = (
+            "Приветствую👋\n"
+            "Я бот компании Coffee Like!\n"
+            "Вы являетесь Админом, поэтому я проведу Вам небольшой экскурс по командам, которые Вам доступны!\n\n"
+
+            "<b><i>Команды:</i></b>\n\n"
+
+            "<i>Анализ:</i>\n"
+            "/start — 😊Начало общения со мной\n"
+            "/help — 📋Описание всех команд, доступных Вам\n"
+            "/get_table — 📑Вам присылается файл xlsx (EXL-таблица),\n"
+            "собранная за определённый период времени:\n"
+            "неделю, месяц, год или за несколько лет.\n"
+            "/notification — 👀Включение/отключение уведомлений\n"
+            "о новых отправленных анкетах\n"
+            "/status — 📊Выводит ваш нынешний статус пользователя\n\n"
+
+            "<i>Действия с пользователями:</i>\n"
+            "/ban — Блокировка пользователя\n"
+            "(блокировка администраторов Вам не доступна).\n"
+            "/add_user — Добавления пользователя"
+        )
+
+        with open('img/startimg1.png', 'rb') as photo:
+            bot.send_photo(photo=photo, chat_id=message.chat.id, parse_mode='html', caption=hi_text_admin)
     else:
         ic(usr_id)
         with open('img/startimg1.png', 'rb') as photo:
-            bot.send_photo(photo=photo ,chat_id=message.chat.id, caption=
+            bot.send_photo(photo=photo, chat_id=message.chat.id, parse_mode='Markdown', caption=
 """
 Привет👋
 
 Вас приветствует бот команды Coffee Like!
 Здесь вы можете отправить свою анкету и попасть в нашу дружную команду. Если вы хотите работать у нас, но не достигли 18 лет узнайте про Академию Coffee Like.
 
-Доступные вам команды:
+Доступные вам giкоманды:
+
+
 
 /start — 😊Начало общения со мной
 /info — 📃информация о вакансиях, которые Вас интересуют
@@ -159,33 +176,34 @@ def start(message):
         ic(usr_id)
         keyboard = InlineKeyboardMarkup()
         keyboard.add(InlineKeyboardButton("Академия", callback_data='academy'))
-        keyboard.add(InlineKeyboardButton("Информация о работе", callback_data='info_work'))
         keyboard.add(InlineKeyboardButton("Подать анкету", callback_data='poll'))
+        keyboard.add(InlineKeyboardButton("Информация о работе", callback_data='info_work'))
 
         msg = bot.send_message(chat_id=message.chat.id, text='О чем вы хотите узнать дальше?', reply_markup=keyboard)
         user_ids[msg.id] =  message.from_user.id
         ic(msg.id)
+
 @bot.callback_query_handler(func = lambda callback: callback.data in ['academy', 'poll', 'info_work'])
 def new_step(callback):
     if callback.data == 'academy':
         message_text = (
         "*Академия бариста* — обучение в течение 4 дней, где ребята знакомятся с оборудованием и учатся варить эспрессо и классические напитки. ☕️✨\n\n"
-        "*В программе обучения:*\n"
-        "- <b>День 1: <i>Введение в мир кофе.</i></b>🌍☕️  \n"
+        "В программе обучения:\n"
+        "- *День 1*: **Введение в мир кофе.** 🌍☕️  \n"
         "  - История кофе и его сорта.  \n"
         "  - Знакомство с оборудованием: кофемашины, кофемолки и аксессуары.  \n\n"
-        "- <b>День 2: <i>Основы приготовления эспрессо.</i></b> 🎓☕️  \n"
+        "- *День 2*: **Основы приготовления эспрессо.** 🎓☕️  \n"
         "  - Техника помола и дозировки.  \n"
         "  - Практика: варим идеальный эспрессо!  \n\n"
-        "- <b>День 3: <i>Классические кофейные напитки.</i></b> 🍵❤️  \n"
+        "- *День 3*: **Классические кофейные напитки.** 🍵❤️  \n"
         "  - Приготовление капучино, латте и американо.  \n"
         "  - Искусство латте-арта: создаем красивые узоры на поверхности напитка. 🎨✨  \n\n"
-        "- <b>День 4: <i>Углубленное изучение и практика.</i></b> 🔍💪  \n"
+        "- *День 4*: **Углубленное изучение и практика.** 🔍💪  \n"
         "  - Советы по обслуживанию оборудования.  \n"
         "  - Итоговая практика: готовим напитки на скорость и качество.  \n\n"
-        "По окончании курса вы получите сертификат и сможете уверенно работать в кофейне <b>Coffee Like</b>! 🎓🏆"
+        "По окончании курса вы получите сертификат и сможете уверенно работать в кофейне **Coffee Like**! 🎓🏆"
     )
-        bot.reply_to(message=callback.message, text=message_text, parse_mode = "HTML")
+        bot.reply_to(message=callback.message, text=message_text, parse_mode = "Markdown")
     elif callback.data == 'poll':
         ic(callback.message.id)
         user_id = user_ids[callback.message.id]
@@ -302,10 +320,10 @@ def baned(message):
     usr_id = db.get_id(message.text)
 
     role = db.get_role(usr_id)
-    if role == None:
+    if role is None:
         bot.send_message(message.chat.id, "Пользователь не найден в базе данных")
         return
-    if(role == 'user'):
+    if role == 'user':
         kb = InlineKeyboardMarkup(row_width=1)
         esc = InlineKeyboardButton(text='Отмена', callback_data='esc')
         ban = InlineKeyboardButton(text='Да', callback_data=f'ban_{message.text}')
@@ -359,30 +377,32 @@ def accepted(message):
 def add_admin(message):
     sent = bot.send_message(message.chat.id, "Кого?")
     bot.register_next_step_handler(sent, admin)
+
 def admin(message):
-    username = message.text
+    username = message.text[1:]
     id = db.get_id(username)
     role = db.get_role(id)
-    if(not role):
+    if not role:
         bot.send_message(message.chat.id, "Нет в бд")
         return
     db.edit_rol(id, 'admin')
-    db.edit_notif(id, 1)
+    db.edit_notif(id, True)
     bot.send_message(message.chat.id, "теперь админ")
 
 @bot.message_handler(commands = ['add_dev'], func= lambda message: db.is_dev(message.from_user.id))
 def add_dev(message):
     sent = bot.send_message(message.chat.id, "Кого?")
     bot.register_next_step_handler(sent, dev)
+
 def dev(message):
-    username = message.from_user.username
+    username = message.from_user.username[1:]
     id = message.from_user.id
     role = db.get_role(id)
-    if(not role):
+    if not role:
         bot.send_message(message.chat.id, "Нет в бд")
         return
     db.edit_rol(id, 'dev')
-    db.edit_notif(id, 1)
+    db.edit_notif(id, True)
     bot.send_message(message.chat.id, "теперь супер-админ")
 
 
@@ -392,10 +412,14 @@ def dev(message):
 
 def create_inline_keyboard(current_index, total_questions):
     keyboard = InlineKeyboardMarkup()
-    if current_index > 0:
-        keyboard.add(InlineKeyboardButton("Назад", callback_data='back'))
-    if current_index < total_questions - 1:
-        keyboard.add(InlineKeyboardButton("Вперед", callback_data='forward'))
+    back = InlineKeyboardButton("⏪", callback_data='back')
+    forward = InlineKeyboardButton("⏩", callback_data='forward')
+    if current_index == 0:
+        keyboard.add(back)
+    elif current_index == total_questions - 1:
+        keyboard.add(forward)
+    else:
+        keyboard.add(back, forward)
     return keyboard
 
 def create_reply_keyboard(options):
@@ -404,7 +428,7 @@ def create_reply_keyboard(options):
         keyboard.add(KeyboardButton(option))
     return keyboard
 
-@bot.message_handler(commands=['poll'], func = lambda message: not db.is_admin(message.from_user.id) and not users_is_poll[message.from_user.id])
+@bot.message_handler(commands=['poll'], func = lambda message: not db.is_admin(message.from_user.id) and message.from_user.id in users_is_poll)
 def start_quiz(message):
     ic(message.from_user.username)
     user_id = message.from_user.id
@@ -439,19 +463,22 @@ def ask_question(user_id):
 
         # Добавляем инлайн-кнопки в отдельном сообщении
         inline_keyboard = create_inline_keyboard(question_index, len(questions))
-        msg = bot.send_message(user_id, "Навигация:", reply_markup=inline_keyboard)
+        msg = bot.send_message(user_id, "*Навигация по вопросам*", parse_mode='Markdown', reply_markup=inline_keyboard)
         user_message_ids_to_del[user_id] = msg.message_id
     else:
-        message_text = "Спасибо за участие! Ваши ответы: \n"
-        for key, value in user_answers[user_id]:
-            message_text+=key+" "+value+"\n"
-        bot.send_message(user_id, message_text)
+        count = 1
+        answers = ""
+        for i in questions:
+            answers += f"{count}. {i[0]}: ___{user_answers[user_id][i[0]]}___\n"
+            count += 1
+        bot.send_message(user_id, "*Опрос пройден.*\nВот все ваши ответы:" + answers, parse_mode='markdown')
         add_row_to_excel(file_path=excel_file, new_row=user_answers[user_id])
+        users_is_poll.remove(user_id)
         del user_answers[user_id]
         del user_question_index[user_id]
         del user_message_ids_to_del[user_id]
 
-@bot.callback_query_handler(func=lambda call: call.data)
+@bot.callback_query_handler(func=lambda call: call.data in ['back', 'forward'])
 def handle_callback_query(call):
     user_id = call.from_user.id
     question_index = user_question_index[user_id]
@@ -556,11 +583,8 @@ def goydu(message) -> None:
 ГОЙДА                      ГОЙДА
 ГОЙДА                      ГОЙДА
 ГОЙДА                      ГОЙДА
-ГОЙДА                      ГОЙДА
-🍑🍆💦😏🔥🍒🍭🍬🍸🍹🍷🍾💋💃🕺🍌🍈'''
+ГОЙДА                      ГОЙДА'''
     # Пасхалка с множеством "гойд", составляющих большую "гойду"
     bot.send_message(message.chat.id, text)
-@bot.message_handler(func = lambda message : True)
-def nepon(message):
-    bot.send_sticker(message.chat.id, "CAACAgIAAxkBAAENDdRnJJApB2xNeugkIVf9JGr91IGilAACGVUAAopuGUkC4emTeHFA6zYE")
+
 bot.polling(none_stop=True)
