@@ -1,5 +1,7 @@
-import telebot
+from gc import callbacks
 
+import telebot
+from pyexpat.errors import messages
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, \
     ReplyKeyboardRemove
 
@@ -13,10 +15,11 @@ from datetime import datetime, timedelta
 # dev
 from icecream import ic
 
+#from gptgovno import user_message_ids
 
 # dev
 
-API_TOKEN = '7945741419:AAH1F1zVR4xlLfX6_HHt2V_HoWQO-qVv_zc' # ЗАМЕНИТЕ НА СВОЙ
+API_TOKEN = '7712920785:AAGLtViAA6H34GcDBBy896TCZX_mwwjM80M' # ЗАМЕНИТЕ НА СВОЙ
 bot = telebot.TeleBot(API_TOKEN)
 
 
@@ -24,6 +27,7 @@ bot = telebot.TeleBot(API_TOKEN)
 # user
 
 db = UsersTable()
+
 questions = [
     ("Какая вакансия тебя заинтересовала? ✨", ["Бариста", "Повар"]),  # Открытый вопрос
     ("ФИО: 📝", 0),  # Закрытый вопрос
@@ -154,6 +158,7 @@ def start(message):
         with open('img/startimg1.png', 'rb') as photo:
             bot.send_photo(photo=photo, chat_id=message.chat.id, parse_mode='html', caption=hi_text_admin)
     else:
+        ic(usr_id)
         with open('img/startimg1.png', 'rb') as photo:
             bot.send_photo(photo=photo, chat_id=message.chat.id, parse_mode='Markdown', caption=
 """
@@ -181,7 +186,24 @@ def start(message):
 @bot.callback_query_handler(func = lambda callback: callback.data in ['academy', 'poll', 'info_work'])
 def new_step(callback):
     if callback.data == 'academy':
-        bot.reply_to(message=callback.message, text='ТЕКСТ ПРО АКАДЕМИЮ')
+        message_text = (
+        "*Академия бариста* — обучение в течение 4 дней, где ребята знакомятся с оборудованием и учатся варить эспрессо и классические напитки. ☕️✨\n\n"
+        "В программе обучения:\n"
+        "- *День 1*: **Введение в мир кофе.** 🌍☕️  \n"
+        "  - История кофе и его сорта.  \n"
+        "  - Знакомство с оборудованием: кофемашины, кофемолки и аксессуары.  \n\n"
+        "- *День 2*: **Основы приготовления эспрессо.** 🎓☕️  \n"
+        "  - Техника помола и дозировки.  \n"
+        "  - Практика: варим идеальный эспрессо!  \n\n"
+        "- *День 3*: **Классические кофейные напитки.** 🍵❤️  \n"
+        "  - Приготовление капучино, латте и американо.  \n"
+        "  - Искусство латте-арта: создаем красивые узоры на поверхности напитка. 🎨✨  \n\n"
+        "- *День 4*: **Углубленное изучение и практика.** 🔍💪  \n"
+        "  - Советы по обслуживанию оборудования.  \n"
+        "  - Итоговая практика: готовим напитки на скорость и качество.  \n\n"
+        "По окончании курса вы получите сертификат и сможете уверенно работать в кофейне **Coffee Like**! 🎓🏆"
+    )
+        bot.reply_to(message=callback.message, text=message_text, parse_mode = "Markdown")
     elif callback.data == 'poll':
         ic(callback.message.id)
         user_id = user_ids[callback.message.id]
@@ -190,11 +212,29 @@ def new_step(callback):
         current_date = datetime.now().date()
         user_answers[user_id]["date"] = current_date
         user_question_index[user_id] = 0  # Начинаем с первого вопроса
-        users_is_poll.add(user_id)
+        users_is_poll[user_id] = 1
         ask_question(user_id)
 
     elif callback.data == 'info_work':
-        bot.reply_to(message=callback.message, text='ТЕКСТ ИНФОРМОЦИЯ ПРО РАБОТУ')
+        message_text = (
+            "*1. Срок работы бариста:*\n"
+        "   В среднем 10 месяцев. ☕️📅✨\n\n"
+        "*2. Возможности роста:*\n"
+        "   Бариста могут развиваться внутри сети кофеен, а также переходить в другие отделы компании. "
+        "Есть сотрудники, работающие уже 3-4 года. 🚀🌟\n\n"
+        "*3. График работы:*\n"
+        "   Гибкий, с различными вариантами смен, включая:\n"
+        "   - 5/2 (реже); 📅\n"
+        "   - 2/2, 2/3, 3/2; 🔄\n"
+        "   - Полный рабочий день по 12 часов; ⏰\n"
+        "   - Утренние смены (с 8:00/9:00/10:00 до 14:00) и вечерние смены (с 14:00 до 22:00). 🌅🌆\n\n"
+        "*4. Оплата труда:*\n"
+        "   - Стажер — 150 рублей в час; 💵\n"
+        "   - После аттестации — 200 рублей в час; 💰\n"
+        "   - Возможность увеличить ставку с дополнительной мотивацией от 1% до 3% от продаж. 📈"
+
+        )
+        bot.reply_to(message=callback.message, text=message_text, parse_mode = "Markdown")
 
 
 @bot.message_handler(func = lambda message:message.text == 'гойда'[0:len(message.text)])
@@ -208,8 +248,6 @@ def goida(message):
 
 
 # admin
-
-@bot.message_handler(command=['/status '], func = lambda message: db.is_admin(message.from_user.id))
 
 @bot.message_handler(commands = ['get_table'], func= lambda message: db.is_admin(message.from_user.id))
 def get_table(message):
@@ -279,9 +317,7 @@ def ban(message):
 
 
 def baned(message):
-    username = message.text[1:]
-    usr_id = db.get_id(username)
-    is_push = db.is_notif(usr_id)
+    usr_id = db.get_id(message.text)
 
     role = db.get_role(usr_id)
     if role is None:
