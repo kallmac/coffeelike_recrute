@@ -1,5 +1,6 @@
 
 import telebot
+from pyexpat.errors import messages
 
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, \
     ReplyKeyboardRemove
@@ -337,7 +338,7 @@ def ban(message):
 
 
 def baned(message):
-    usr_id = db.get_id(message.text)
+    usr_id = db.get_id(message.text[1:])
 
     role = db.get_role(usr_id)
     if role is None:
@@ -346,13 +347,13 @@ def baned(message):
     if role == 'user':
         kb = InlineKeyboardMarkup(row_width=1)
         esc = InlineKeyboardButton(text='Отмена', callback_data='esc')
-        ban = InlineKeyboardButton(text='Да', callback_data=f'ban_{message.text}')
+        ban = InlineKeyboardButton(text='Да', callback_data=f'ban_{message.text[1:]}')
         kb.add(ban,esc)
         bot.send_message(message.chat.id, "Забанить?", reply_markup=kb)
     elif role == 'ban':
         kb = InlineKeyboardMarkup(row_width=1)
         esc = InlineKeyboardButton(text='Отмена', callback_data='esc')
-        unban = InlineKeyboardButton(text='Да', callback_data=f'unban_{message.text}')
+        unban = InlineKeyboardButton(text='Да', callback_data=f'unban_{message.text[1:]}')
         kb.add(unban, esc)
         bot.send_message(message.chat.id, "Пользователь забанен. Желаете разбанить?", reply_markup=kb)
     elif role == 'admin' or role == 'dev':
@@ -367,6 +368,9 @@ def ban(callback):
     ic(usr_id)
     db.edit_rol(usr_id=usr_id, role='ban')
     bot.send_message(callback.message.chat.id, "Пользователь заблокирован!")
+    cht_id = db.get_user(usr_id)["chat_id"]
+    bot.send_sticker(cht_id, "CAACAgIAAxkBAAENDdZnJJCjQasN787Pv9mEBT7gBZLfxwACR1YAAtTAGEntuLbdzn-UrTYE")
+    bot.send_message(cht_id, "Вас заблокировал администратор бота :(")
 
 
 @bot.callback_query_handler(func = lambda callback : callback.data.split('_')[0] == 'unban')
@@ -374,6 +378,9 @@ def unban(callback):
     usr_id = db.get_id(callback.data.split('_')[1])
     db.edit_rol(usr_id=usr_id, role='user')
     bot.send_message(callback.message.chat.id, "Пользователь разблокирован!")
+    cht_id = db.get_user(usr_id)["chat_id"]
+    bot.send_sticker(cht_id, "CAACAgIAAxkBAAENDfdnJMPUEhk0ptmkH5M9CJuG7pOBswACsFcAAmDsGUnCwQABFitxl9U2BA")
+    bot.send_message(cht_id, "Вас разблокировал администратор бота :)")
 
 
 
@@ -388,7 +395,11 @@ def accepted(message):
     # Здесь можно добавить логику для проверки, существует ли пользователь
     if role:  # Предполагаем, что есть такая функция
         bot.send_message(message.chat.id, "Пользователь найден. Информация отправлена.")
-        bot.send_message(db.get_user(usr_id)["chat_id"], "Ваша заявка была одобрена, с вами свяжутся позже. ❇️")
+
+        cht_id = db.get_user(usr_id)["chat_id"]
+        bot.send_sticker(cht_id, "CAACAgIAAxkBAAENDfdnJMPUEhk0ptmkH5M9CJuG7pOBswACsFcAAmDsGUnCwQABFitxl9U2BA")
+        bot.send_message(cht_id, "Ваша заявка была одобрена, с вами свяжутся позже. ❇️")
+
     else:
         bot.send_message(message.chat.id, "Пользователь не найден.")
 
@@ -492,7 +503,13 @@ def ask_question(user_id):
             answers += f"{count}. {i[0]}: ___{user_answers[user_id][i[0]]}___\n"
             count += 1
         bot.send_message(user_id, "*Опрос пройден.*\nВот все ваши ответы:" + answers, parse_mode='markdown')
+
         add_row_to_excel(file_path=excel_file, new_row=user_answers[user_id])
+        to_admins = f"*Пользователь @{db.get_user(user_id)['username']}.*\nЕго ответы:" + answers
+        ic(db.get_notif())
+        for id in db.get_notif():
+            bot.send_message(id[0], text=to_admins, parse_mode='markdown')
+
         del user_answers[user_id]
         del user_question_index[user_id]
         del user_message_ids_to_del[user_id]

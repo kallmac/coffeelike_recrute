@@ -124,7 +124,7 @@ class UsersTable:
     def get_notif(self):
         conn = sqlite3.connect('db/everyone.sql')
         cur = conn.cursor()
-        cur.execute("SELECT chat_id FROM everyone WHERE (notif = 1 AND (status = 'admin' OR status = 'dev'))")
+        cur.execute("SELECT tg_id, tg_username FROM everyone WHERE (notif = 1 AND (status = 'admin' OR status = 'dev'))")
         table = cur.fetchall()
         conn.commit()
         cur.close()
