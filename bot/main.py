@@ -152,8 +152,8 @@ def start(message):
         ic(usr_id)
         keyboard = InlineKeyboardMarkup()
         keyboard.add(InlineKeyboardButton("Академия", callback_data='academy'))
-        keyboard.add(InlineKeyboardButton("Подать анкету", callback_data='poll'))
         keyboard.add(InlineKeyboardButton("Информация о работе", callback_data='info_work'))
+        keyboard.add(InlineKeyboardButton("Подать анкету", callback_data='poll'))
 
         msg = bot.send_message(chat_id=message.chat.id, text='О чем вы хотите узнать дальше?', reply_markup=keyboard)
         user_ids[msg.id] =  message.from_user.id
