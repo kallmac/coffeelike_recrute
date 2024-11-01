@@ -49,11 +49,11 @@ questions = [
     "Переезд",
     "Не работал/а ранее",
     "Другое"]),
-    ("Желаемый график работы? ⏰", 0),
+    ("Желаемый график работы? ⏰", ["5/2", "2/2", "3/2", "2/3"]),
     ("Желаемый уровень заработной платы? 💰", 0),
     ("На какой период ищешь работу? 📅", 0),
     ("Район города, в котором тебе будет удобно работать (можешь указать несколько): 📍", 0),
-    ("Как узнали о нашей вакансии? 🔍",
+    ("Это последний вопрос! Как вы узнали о нашей вакансии? 🔍",
      ["hh.ru",
     "Авито",
     "От друзей",
@@ -121,8 +121,15 @@ def filter_exel(date: datetime.date, input_file: str):
 # user
 
 # all users
-
-@bot.message_handler(commands= ['start', 'info'], func = lambda message: not message.from_user.id in users_is_poll)
+@bot.message_handler(func = lambda message : db.is_ban(message.from_user.id))
+def ban_message(message):
+    bot.send_sticker(message.chat.id, "CAACAgIAAxkBAAENDdZnJJCjQasN787Pv9mEBT7gBZLfxwACR1YAAtTAGEntuLbdzn-UrTYE")
+    bot.reply_to(message=message, text="Администрация ограничила вам доступ к данному боту.")
+@bot.callback_query_handler(func = lambda callback : db.is_ban(callback.from_user.id))
+def ban_callback(callback):
+    bot.send_sticker(callback.message.chat.id, "CAACAgIAAxkBAAENDdZnJJCjQasN787Pv9mEBT7gBZLfxwACR1YAAtTAGEntuLbdzn-UrTYE")
+    bot.reply_to(message=callback.message, text="Администрация ограничила вам доступ к данному боту.")
+@bot.message_handler(commands= ['start'])
 def start(message):
     print(message.from_user.id, message.from_user.username)
     db.add_user({"id": str(message.from_user.id), "username": message.from_user.username, "status": "user", "notif": 1, "chat_id" : message.chat.id})
@@ -160,7 +167,7 @@ def start(message):
     else:
         ic(usr_id)
         with open('img/startimg1.png', 'rb') as photo:
-            bot.send_photo(photo=photo, chat_id=message.chat.id, parse_mode='Markdown', caption=
+            bot.send_photo(photo=photo ,chat_id=message.chat.id, caption=
 """
 Привет👋
 
@@ -176,8 +183,8 @@ def start(message):
         ic(usr_id)
         keyboard = InlineKeyboardMarkup()
         keyboard.add(InlineKeyboardButton("Академия", callback_data='academy'))
-        keyboard.add(InlineKeyboardButton("Подать анкету", callback_data='poll'))
         keyboard.add(InlineKeyboardButton("Информация о работе", callback_data='info_work'))
+        keyboard.add(InlineKeyboardButton("Подать анкету", callback_data='poll'))
 
         msg = bot.send_message(chat_id=message.chat.id, text='О чем вы хотите узнать дальше?', reply_markup=keyboard)
         user_ids[msg.id] =  message.from_user.id
@@ -188,22 +195,22 @@ def new_step(callback):
     if callback.data == 'academy':
         message_text = (
         "*Академия бариста* — обучение в течение 4 дней, где ребята знакомятся с оборудованием и учатся варить эспрессо и классические напитки. ☕️✨\n\n"
-        "В программе обучения:\n"
-        "- *День 1*: **Введение в мир кофе.** 🌍☕️  \n"
+        "*В программе обучения:*\n"
+        "- <b>День 1: <i>Введение в мир кофе.</i></b>🌍☕️  \n"
         "  - История кофе и его сорта.  \n"
         "  - Знакомство с оборудованием: кофемашины, кофемолки и аксессуары.  \n\n"
-        "- *День 2*: **Основы приготовления эспрессо.** 🎓☕️  \n"
+        "- <b>День 2: <i>Основы приготовления эспрессо.</i></b> 🎓☕️  \n"
         "  - Техника помола и дозировки.  \n"
         "  - Практика: варим идеальный эспрессо!  \n\n"
-        "- *День 3*: **Классические кофейные напитки.** 🍵❤️  \n"
+        "- <b>День 3: <i>Классические кофейные напитки.</i></b> 🍵❤️  \n"
         "  - Приготовление капучино, латте и американо.  \n"
         "  - Искусство латте-арта: создаем красивые узоры на поверхности напитка. 🎨✨  \n\n"
-        "- *День 4*: **Углубленное изучение и практика.** 🔍💪  \n"
+        "- <b>День 4: <i>Углубленное изучение и практика.</i></b> 🔍💪  \n"
         "  - Советы по обслуживанию оборудования.  \n"
         "  - Итоговая практика: готовим напитки на скорость и качество.  \n\n"
-        "По окончании курса вы получите сертификат и сможете уверенно работать в кофейне **Coffee Like**! 🎓🏆"
+        "По окончании курса вы получите сертификат и сможете уверенно работать в кофейне <b>Coffee Like</b>! 🎓🏆"
     )
-        bot.reply_to(message=callback.message, text=message_text, parse_mode = "Markdown")
+        bot.reply_to(message=callback.message, text=message_text, parse_mode = "HTML")
     elif callback.data == 'poll':
         ic(callback.message.id)
         user_id = user_ids[callback.message.id]
@@ -583,8 +590,11 @@ def goydu(message) -> None:
 ГОЙДА                      ГОЙДА
 ГОЙДА                      ГОЙДА
 ГОЙДА                      ГОЙДА
-ГОЙДА                      ГОЙДА'''
+ГОЙДА                      ГОЙДА
+🍑🍆💦😏🔥🍒🍭🍬🍸🍹🍷🍾💋💃🕺🍌🍈'''
     # Пасхалка с множеством "гойд", составляющих большую "гойду"
     bot.send_message(message.chat.id, text)
-
+@bot.message_handler(func = lambda message : True)
+def nepon(message):
+    bot.send_sticker(message.chat.id, "CAACAgIAAxkBAAENDdRnJJApB2xNeugkIVf9JGr91IGilAACGVUAAopuGUkC4emTeHFA6zYE")
 bot.polling(none_stop=True)
