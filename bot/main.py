@@ -120,7 +120,14 @@ def filter_exel(date: datetime.date, input_file: str):
 # user
 
 # all users
-
+@bot.message_handler(func = lambda message : db.is_ban(message.from_user.id))
+def ban_message(message):
+    bot.send_sticker(message.chat.id, "CAACAgIAAxkBAAENDdZnJJCjQasN787Pv9mEBT7gBZLfxwACR1YAAtTAGEntuLbdzn-UrTYE")
+    bot.reply_to(message=message, text="Администрация ограничила вам доступ к данному боту.")
+@bot.callback_query_handler(func = lambda callback : db.is_ban(callback.from_user.id))
+def ban_callback(callback):
+    bot.send_sticker(callback.message.chat.id, "CAACAgIAAxkBAAENDdZnJJCjQasN787Pv9mEBT7gBZLfxwACR1YAAtTAGEntuLbdzn-UrTYE")
+    bot.reply_to(message=callback.message, text="Администрация ограничила вам доступ к данному боту.")
 @bot.message_handler(commands= ['start'])
 def start(message):
     print(message.from_user.id, message.from_user.username)
@@ -129,6 +136,7 @@ def start(message):
     usr_id = message.from_user.id
     db.edit_rol(usr_id, 'user')
     if db.is_ban(usr_id):
+        bot.send_sticker(message.chat.id, "CAACAgIAAxkBAAENDdZnJJCjQasN787Pv9mEBT7gBZLfxwACR1YAAtTAGEntuLbdzn-UrTYE")
         bot.reply_to(message=message, text="Администрация ограничила вам доступ к данному боту.")
     elif db.is_admin(usr_id):
         ic(db.is_admin(usr_id))
@@ -157,7 +165,6 @@ def start(message):
         msg = bot.send_message(chat_id=message.chat.id, text='О чем вы хотите узнать дальше?', reply_markup=keyboard)
         user_ids[msg.id] =  message.from_user.id
         ic(msg.id)
-
 @bot.callback_query_handler(func = lambda callback: callback.data in ['academy', 'poll', 'info_work'])
 def new_step(callback):
     if callback.data == 'academy':
@@ -553,5 +560,7 @@ def goydu(message) -> None:
 🍑🍆💦😏🔥🍒🍭🍬🍸🍹🍷🍾💋💃🕺🍌🍈'''
     # Пасхалка с множеством "гойд", составляющих большую "гойду"
     bot.send_message(message.chat.id, text)
-
+@bot.message_handler(func = lambda message : True)
+def nepon(message):
+    bot.send_sticker(message.chat.id, "CAACAgIAAxkBAAENDdRnJJApB2xNeugkIVf9JGr91IGilAACGVUAAopuGUkC4emTeHFA6zYE")
 bot.polling(none_stop=True)
