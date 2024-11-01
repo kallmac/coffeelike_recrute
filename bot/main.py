@@ -17,7 +17,7 @@ from icecream import ic
 
 # dev
 
-API_TOKEN = '7712920785:AAGLtViAA6H34GcDBBy896TCZX_mwwjM80M' # ЗАМЕНИТЕ НА СВОЙ
+API_TOKEN = '7945741419:AAH1F1zVR4xlLfX6_HHt2V_HoWQO-qVv_zc' # ЗАМЕНИТЕ НА СВОЙ
 bot = telebot.TeleBot(API_TOKEN)
 
 
@@ -31,7 +31,6 @@ questions = [
     ("ФИО: 📝", 0),  # Закрытый вопрос
     ("Гражданство: 🌍", 0),  # Открытый вопрос
     ("Город проживания: 🏙️", ["Нижний Новгород", "Киров", "Владимир", "Саратов", "Ижевск"]),
-    ("Твой ник в телеграме (в формате @Name123): 📱", 0),
     ("Контактный номер телефона: 📞", 0),
     ("Количество полных лет: 🎂", 0),
     ("Форма обучения: 🎓", ["Очная", "Очно-заочная", "Заочная", "Не обучаюсь"]),
@@ -47,7 +46,7 @@ questions = [
     "Переезд",
     "Не работал/а ранее",
     "Другое"]),
-    ("Желаемый график работы? ⏰", 0),
+    ("Желаемый график работы? ⏰", ['5/2', '2/2', '3/2', '2/3', '1/0']),
     ("Желаемый уровень заработной платы? 💰", 0),
     ("На какой период ищешь работу? 📅", 0),
     ("Район города, в котором тебе будет удобно работать (можешь указать несколько): 📍", 0),
@@ -62,13 +61,14 @@ questions = [
     "Другое"])
 ]
 
+
 excel_file = 'db/applicants.xlsx'
 
 user_answers = {}
 user_question_index = {}
 user_message_ids_to_del = {}
 user_ids = {}
-users_is_poll = set()
+
 
 
 def notif_to_admin(user):
@@ -77,15 +77,22 @@ def notif_to_admin(user):
         cht_id = cht_id[0]
         bot.send_message(cht_id, f"Пользователь {user} оставил вакансию бариста")
 
-
 def add_row_to_excel(file_path, new_row):
+    # Проверяем, существует ли файл
     if not os.path.exists(file_path):
-
+        # Если файл не существует, создаем новый DataFrame с колонками из new_row
         df = pd.DataFrame(columns=new_row.keys())
+        # Сохраняем пустой DataFrame в Excel файл
         df.to_excel(file_path, index=False, engine='openpyxl')
 
-
-    df = pd.read_excel(file_path, engine='openpyxl')
+    try:
+        # Пытаемся прочитать существующий Excel файл
+        df = pd.read_excel(file_path, engine='openpyxl')
+    except Exception as e:
+        print(f"Ошибка при чтении Excel файла: {e}")
+        # Если чтение не удалось, создаем новый DataFrame
+        df = pd.DataFrame(columns=new_row.keys())
+        print("Создаем новый Excel файл вместо этого.")
 
     # Создаем DataFrame из новой строки (словаря)
     new_data = pd.DataFrame([new_row])
@@ -94,8 +101,11 @@ def add_row_to_excel(file_path, new_row):
     df = pd.concat([df, new_data], ignore_index=True)
 
     # Сохраняем обновленный DataFrame обратно в Excel файл
-    df.to_excel(file_path, index=False, engine='openpyxl')
-
+    try:
+        df.to_excel(file_path, index=False, engine='openpyxl')
+        print("Новая строка успешно добавлена в Excel файл.")
+    except Exception as e:
+        print(f"Ошибка при сохранении Excel файла: {e}")
 def filter_exel(date: datetime.date, input_file: str):
     output_file = input_file.split('.')[0] + "_" + str(date) + ".xlsx"
 
@@ -120,13 +130,23 @@ def filter_exel(date: datetime.date, input_file: str):
 
 # all users
 
-@bot.message_handler(commands= ['start', 'info'], func = lambda message: not message.from_user.id in users_is_poll)
+@bot.message_handler(func = lambda message : db.is_ban(message.from_user.id))
+def ban_message(message):
+    bot.send_sticker(message.chat.id, "CAACAgIAAxkBAAENDdZnJJCjQasN787Pv9mEBT7gBZLfxwACR1YAAtTAGEntuLbdzn-UrTYE")
+    bot.reply_to(message=message, text="Администрация ограничила вам доступ к данному боту.")
+
+@bot.callback_query_handler(func = lambda callback : db.is_ban(callback.from_user.id))
+def ban_callback(callback):
+    bot.send_sticker(callback.message.chat.id, "CAACAgIAAxkBAAENDdZnJJCjQasN787Pv9mEBT7gBZLfxwACR1YAAtTAGEntuLbdzn-UrTYE")
+    bot.reply_to(message=callback.message, text="Администрация ограничила вам доступ к данному боту.")
+
+
+@bot.message_handler(commands= ['start', 'info'], func = lambda message: True)
 def start(message):
     print(message.from_user.id, message.from_user.username)
     db.add_user({"id": str(message.from_user.id), "username": message.from_user.username, "status": "user", "notif": 1, "chat_id" : message.chat.id})
 
     usr_id = message.from_user.id
-    db.edit_rol(usr_id, 'user')
     if db.is_ban(usr_id):
         bot.reply_to(message=message, text="Администрация ограничила вам доступ к данному боту.")
     elif db.is_admin(usr_id):
@@ -212,7 +232,7 @@ def new_step(callback):
         current_date = datetime.now().date()
         user_answers[user_id]["date"] = current_date
         user_question_index[user_id] = 0  # Начинаем с первого вопроса
-        users_is_poll[user_id] = 1
+
         ask_question(user_id)
 
     elif callback.data == 'info_work':
@@ -304,10 +324,10 @@ def change_push(callback):
     bot.delete_message(callback.message.chat.id, callback.message.id)
     if is_push == False:
         is_push = True
-        bot.send_message(callback.message.chat.id, 'Уведомления включены!')
+        bot.send_message(callback.message.chat.id, 'Уведомления включены! 🔔')
     else:
         is_push = False
-        bot.send_message(callback.message.chat.id, 'Уведомления выключены!')
+        bot.send_message(callback.message.chat.id, 'Уведомления выключены! 🔕')
     db.edit_notif(usr_id=usr_id,a=is_push)
 
 @bot.message_handler(commands = ['ban'], func = lambda message: db.is_admin(message.from_user.id) or db.is_dev(message.from_user.id)) #ну бан
@@ -368,7 +388,7 @@ def accepted(message):
     # Здесь можно добавить логику для проверки, существует ли пользователь
     if role:  # Предполагаем, что есть такая функция
         bot.send_message(message.chat.id, "Пользователь найден. Информация отправлена.")
-        bot.send_message(db.get_user(usr_id)["chat_id"], "Ваша заявка была одобрена, с вами свяжутся позже.")
+        bot.send_message(db.get_user(usr_id)["chat_id"], "Ваша заявка была одобрена, с вами свяжутся позже. ❇️")
     else:
         bot.send_message(message.chat.id, "Пользователь не найден.")
 
@@ -383,11 +403,11 @@ def admin(message):
     id = db.get_id(username)
     role = db.get_role(id)
     if not role:
-        bot.send_message(message.chat.id, "Нет в бд")
+        bot.send_message(message.chat.id, "Пользователь не найден")
         return
     db.edit_rol(id, 'admin')
     db.edit_notif(id, True)
-    bot.send_message(message.chat.id, "теперь админ")
+    bot.send_message(message.chat.id, f"Теперь @{username} админ ")
 
 @bot.message_handler(commands = ['add_dev'], func= lambda message: db.is_dev(message.from_user.id))
 def add_dev(message):
@@ -399,11 +419,11 @@ def dev(message):
     id = message.from_user.id
     role = db.get_role(id)
     if not role:
-        bot.send_message(message.chat.id, "Нет в бд")
+        bot.send_message(message.chat.id, "Пользователь не найден")
         return
     db.edit_rol(id, 'dev')
     db.edit_notif(id, True)
-    bot.send_message(message.chat.id, "теперь супер-админ")
+    bot.send_message(message.chat.id, f"Теперь @{username} супер админ")
 
 
 # admin
@@ -428,7 +448,7 @@ def create_reply_keyboard(options):
         keyboard.add(KeyboardButton(option))
     return keyboard
 
-@bot.message_handler(commands=['poll'], func = lambda message: not db.is_admin(message.from_user.id) and message.from_user.id in users_is_poll)
+@bot.message_handler(commands=['poll'], func = lambda message: not db.is_admin(message.from_user.id))
 def start_quiz(message):
     ic(message.from_user.username)
     user_id = message.from_user.id
@@ -473,7 +493,6 @@ def ask_question(user_id):
             count += 1
         bot.send_message(user_id, "*Опрос пройден.*\nВот все ваши ответы:" + answers, parse_mode='markdown')
         add_row_to_excel(file_path=excel_file, new_row=user_answers[user_id])
-        users_is_poll.remove(user_id)
         del user_answers[user_id]
         del user_question_index[user_id]
         del user_message_ids_to_del[user_id]
@@ -530,7 +549,7 @@ def handle_response(message):
 
 # user
 @bot.message_handler(commands = ['goida'])
-def goydu(message) -> None:
+def goydu(message):
     text = '''ГОЙДА ГОЙДА ГОЙДА
 ГОЙДА ГОЙДА ГОЙДА
 ГОЙДА
@@ -586,5 +605,9 @@ def goydu(message) -> None:
 ГОЙДА                      ГОЙДА'''
     # Пасхалка с множеством "гойд", составляющих большую "гойду"
     bot.send_message(message.chat.id, text)
+
+@bot.message_handler(func = lambda message : True)
+def nepon(message):
+    bot.send_sticker(message.chat.id, "CAACAgIAAxkBAAENDdRnJJApB2xNeugkIVf9JGr91IGilAACGVUAAopuGUkC4emTeHFA6zYE")
 
 bot.polling(none_stop=True)
