@@ -128,29 +128,31 @@ def start(message):
     if db.is_ban(usr_id):
         bot.reply_to(message=message, text="Администрация ограничила вам доступ к данному боту.")
     elif db.is_admin(usr_id):
+        hi_text_admin = (
+            "Приветствую👋\n"
+            "Я бот компании Coffee Like!\n"
+            "Вы являетесь Админом, поэтому я проведу Вам небольшой экскурс по командам, которые Вам доступны!\n\n"
+
+            "<b><i>Команды:</i></b>\n\n"
+
+            "<i>Анализ:</i>\n"
+            "/start — 😊Начало общения со мной\n"
+            "/help — 📋Описание всех команд, доступных Вам\n"
+            "/get_table — 📑Вам присылается файл xlsx (EXL-таблица),\n"
+            "собранная за определённый период времени:\n"
+            "неделю, месяц, год или за несколько лет.\n"
+            "/notification — 👀Включение/отключение уведомлений\n"
+            "о новых отправленных анкетах\n"
+            "/status — 📊Выводит ваш нынешний статус пользователя\n\n"
+
+            "<i>Действия с пользователями:</i>\n"
+            "/ban — Блокировка пользователя\n"
+            "(блокировка администраторов Вам не доступна).\n"
+            "/add_user — Добавления пользователя"
+        )
+
         with open('img/startimg1.png', 'rb') as photo:
-            bot.send_photo(photo=photo, chat_id=message.chat.id, parse_mode='Markdown', caption=
-"""
-Приветствую👋 
-Я бот компании Coffee Like! 
-Вы являетесь Админом, поэтому я проведу Вам небольшой экскурс по командам, которые Вам доступны!
-
-*__Команды:__*
-
-**Анализ:**
-/start — 😊Начало общения со мной
-/help — 📋Описание всех команд, доступных Вам
-/get_table — 📑Вам присылается файл xlsx (EXL-таблица), 
-                       собранная за определённый период времени: 
-                       неделю, месяц, год или за несколько лет.
-/notification — 👀Включение/отключение уведомлений 
-                              о новых отправленных анкетах
-/status — 📊Выводит ваш нынешний статус пользователя
-
-**Действия с пользователями:**
-/ban — Блокировка пользователя 
-          (блокировка администраторов Вам не доступна).
-/add_user — Добавления пользователя""")
+            bot.send_photo(photo=photo, chat_id=message.chat.id, parse_mode='html', caption=hi_text_admin)
     else:
         with open('img/startimg1.png', 'rb') as photo:
             bot.send_photo(photo=photo, chat_id=message.chat.id, parse_mode='Markdown', caption=
@@ -206,6 +208,8 @@ def goida(message):
 
 
 # admin
+
+@bot.message_handler(command=['/status '], func = lambda message: db.is_admin(message.from_user.id))
 
 @bot.message_handler(commands = ['get_table'], func= lambda message: db.is_admin(message.from_user.id))
 def get_table(message):
@@ -346,7 +350,7 @@ def admin(message):
         bot.send_message(message.chat.id, "Нет в бд")
         return
     db.edit_rol(id, 'admin')
-    db.edit_notif(id, 1)
+    db.edit_notif(id, True)
     bot.send_message(message.chat.id, "теперь админ")
 
 @bot.message_handler(commands = ['add_dev'], func= lambda message: db.is_dev(message.from_user.id))
@@ -372,10 +376,14 @@ def dev(message):
 
 def create_inline_keyboard(current_index, total_questions):
     keyboard = InlineKeyboardMarkup()
-    if current_index > 0:
-        keyboard.add(InlineKeyboardButton("Назад", callback_data='back'))
-    if current_index < total_questions - 1:
-        keyboard.add(InlineKeyboardButton("Вперед", callback_data='forward'))
+    back = InlineKeyboardButton("⏪", callback_data='back')
+    forward = InlineKeyboardButton("⏩", callback_data='forward')
+    if current_index == 0:
+        keyboard.add(back)
+    elif current_index == total_questions - 1:
+        keyboard.add(forward)
+    else:
+        keyboard.add(back, forward)
     return keyboard
 
 def create_reply_keyboard(options):
@@ -419,10 +427,15 @@ def ask_question(user_id):
 
         # Добавляем инлайн-кнопки в отдельном сообщении
         inline_keyboard = create_inline_keyboard(question_index, len(questions))
-        msg = bot.send_message(user_id, "Навигация:", reply_markup=inline_keyboard)
+        msg = bot.send_message(user_id, "*Навигация по вопросам*", parse_mode='Markdown', reply_markup=inline_keyboard)
         user_message_ids_to_del[user_id] = msg.message_id
     else:
-        bot.send_message(user_id, "Спасибо за участие! Ваши ответы: " + str(user_answers[user_id]))
+        count = 1
+        answers = ""
+        for i in questions:
+            answers += f"{count}. {i[0]}: ___{user_answers[user_id][i[0]]}___\n"
+            count += 1
+        bot.send_message(user_id, "*Опрос пройден.*\nВот все ваши ответы:" + answers, parse_mode='markdown')
         add_row_to_excel(file_path=excel_file, new_row=user_answers[user_id])
         users_is_poll.remove(user_id)
         del user_answers[user_id]
